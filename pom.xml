@@ -1,5 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starters</artifactId>
+    <version>2.2.7.RELEASE</version>
+  </parent>
+
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.penn-live</groupId>
   <artifactId>framework-parent</artifactId>
@@ -9,9 +18,36 @@
   <url>https://github.com/Penn-Live/framework-parent</url>
   <description>Capture Java</description>
 
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.16.10</version>
+    </dependency>
+
+
+    <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>18.0</version>
+    </dependency>
+
+  </dependencies>
+
+  <properties>
+    <version.spring>4.3.16.RELEASE</version.spring>
+  </properties>
+
   <modules>
     <module>framework-common</module>
-    <module>framework-rest</module>
+    <module>framework-rest-starter</module>
+    <module>framework-demo</module>
   </modules>
 
   <licenses>
@@ -29,9 +65,9 @@
 
   <developers>
     <developer>
-      <name>kiwenlau</name>
-      <id>kiwenlau</id>
-      <email>kiwenlau@gmail.com</email>
+      <name>penn.z.tang</name>
+      <id>penn</id>
+      <email>penn.z.tang@gmail.com</email>
       <roles>
         <role>Developer</role>
       </roles>
@@ -100,13 +136,4 @@
     </profile>
   </profiles>
 
-
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
 </project>
