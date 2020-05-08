@@ -44,9 +44,6 @@ public class WebContextSetter implements HandlerInterceptor {
 
     /**
      * body params
-     *
-     * @param httpServletRequest
-     * @return
      */
     private JSONObject parseBodyParams(HttpServletRequest httpServletRequest) {
         try {

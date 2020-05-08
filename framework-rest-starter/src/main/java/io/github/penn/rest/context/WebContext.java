@@ -29,8 +29,6 @@ public class WebContext {
 
     /**
      * set a current request info
-     *
-     * @param currentRequestContext
      */
     public static void addCurrentRequestContext(CurrentRequestContext currentRequestContext) {
         currentRequest.set(currentRequestContext);
@@ -40,8 +38,6 @@ public class WebContext {
 
     /**
      * get current request
-     *
-     * @return
      */
     public static HttpServletRequest getRequest() {
         CurrentRequestContext currentRequestContext = currentRequest.get();
@@ -54,8 +50,6 @@ public class WebContext {
 
     /**
      * get current session
-     *
-     * @return
      */
     public static HttpSession getSession() {
         CurrentRequestContext currentRequestContext = currentRequest.get();
@@ -68,8 +62,6 @@ public class WebContext {
 
     /**
      * get body ParamJSON
-     *
-     * @return
      */
     public static JSONObject getBodyParamJSON() {
         CurrentRequestContext currentRequestContext = currentRequest.get();
@@ -82,9 +74,6 @@ public class WebContext {
 
     /**
      * get body params in string
-     *
-     * @param paramsName
-     * @return
      */
     public static String getBodyParamString(String paramsName) {
         CurrentRequestContext currentRequestContext = currentRequest.get();
@@ -104,8 +93,6 @@ public class WebContext {
 
     /**
      * bodyParams must has this params or throws exception
-     *
-     * @param names
      */
     public static void bodyParamMustHas(String... names) throws InvalidParamException {
         CurrentRequestContext currentRequestContext = currentRequest.get();
@@ -122,8 +109,6 @@ public class WebContext {
 
     /**
      * bodyParams must has this params or throws exception
-     *
-     * @param names
      */
     public static void bodyParamMustNotEmpty(String... names) {
         CurrentRequestContext currentRequestContext = currentRequest.get();
@@ -141,9 +126,6 @@ public class WebContext {
 
     /**
      * set sessionAttr
-     *
-     * @param name
-     * @param value
      */
     public void setSessionAttr(String name, Object value) {
         CurrentRequestContext currentRequestContext = currentRequest.get();
@@ -156,8 +138,6 @@ public class WebContext {
 
     /**
      * get sessionAttr
-     *
-     * @param name
      */
     public Object getSessionAttr(String name) {
         CurrentRequestContext currentRequestContext = currentRequest.get();
@@ -171,8 +151,6 @@ public class WebContext {
 
     /**
      * get sessionAttr string
-     *
-     * @param name
      */
     public String getSessionAttrString(String name) {
         return (String) getSessionAttr(name);

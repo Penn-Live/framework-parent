@@ -19,8 +19,6 @@ public class RestExceptionAdvice {
 
     /**
      * InvalidParamException
-     *
-     * @return
      */
     @ExceptionHandler({InvalidParamException.class})
     public JSONObject handleInvalidParamException(InvalidParamException invalidParamException) {
