@@ -12,5 +12,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Import(RestConfigurationSelector.class)
-public @interface EnableRest {
+public @interface EnableWebContext {
 }

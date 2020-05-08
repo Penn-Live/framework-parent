@@ -1,6 +1,8 @@
 package io.github.penn.rest;
 
 import com.alibaba.fastjson.JSONObject;
+import io.github.penn.rest.context.CurrentRequestContext;
+import io.github.penn.rest.context.WebContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;

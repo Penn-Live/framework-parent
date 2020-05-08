@@ -1,6 +1,7 @@
 package io.github.penn.rest;
 
 import com.alibaba.fastjson.JSONObject;
+import io.github.penn.rest.context.WebContext;
 
 /**
  * @author tangzhongping
