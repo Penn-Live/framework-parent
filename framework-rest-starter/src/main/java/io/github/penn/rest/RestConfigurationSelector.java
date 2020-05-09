@@ -8,7 +8,7 @@ import org.springframework.core.type.AnnotationMetadata;
  */
 public class RestConfigurationSelector implements ImportSelector {
 
-
+    @Override
     public String[] selectImports(AnnotationMetadata importingClassMetadata) {
         return new String[]{"io.github.penn.rest.RestConfiguration"};
     }

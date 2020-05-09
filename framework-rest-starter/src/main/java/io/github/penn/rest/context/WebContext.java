@@ -103,6 +103,7 @@ public class WebContext {
                     throw new InvalidParamException("no body param=" + name + " in the body params.");
                 }
             }
+            return;
         }
         throw new InvalidParamException("all name are empty");
     }
@@ -119,6 +120,7 @@ public class WebContext {
                     throw new InvalidParamException("empty body param=" + name + " in the body params.");
                 }
             }
+            return;
         }
         throw new InvalidParamException("all name are empty");
     }
