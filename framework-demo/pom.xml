@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>framework-parent</artifactId>
 		<groupId>io.github.penn-live</groupId>
-		<version>1.0</version>
+		<version>1.0.1-RELEASE</version>
 	</parent>
 
 	<groupId>io.github.penn-live</groupId>
@@ -22,8 +22,9 @@
 		<dependency>
 			<groupId>io.github.penn-live</groupId>
 			<artifactId>framework-rest-starter</artifactId>
-			<version>1.0-RELEASE</version>
+			<version>1.0.1-RELEASE</version>
 		</dependency>
+
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

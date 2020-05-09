@@ -7,12 +7,13 @@
     <version>2.2.7.RELEASE</version>
   </parent>
 
-  <modelVersion>4.0.0</modelVersion>
+
   <groupId>io.github.penn-live</groupId>
   <artifactId>framework-parent</artifactId>
   <packaging>pom</packaging>
-  <version>1.0</version>
+  <version>1.0.1-RELEASE</version>
   <name>framework-parent</name>
+  <modelVersion>4.0.0</modelVersion>
   <url>https://github.com/Penn-Live/framework-parent</url>
   <description>Capture Java</description>
 

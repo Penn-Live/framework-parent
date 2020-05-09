@@ -1,7 +1,6 @@
 package io.github.penn.rest.context;
 
 import com.alibaba.fastjson.JSONObject;
-import io.github.penn.rest.context.CurrentRequestContext;
 import io.github.penn.rest.exception.InvalidParamException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
