@@ -1,143 +1,141 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starters</artifactId>
-    <version>2.2.7.RELEASE</version>
-  </parent>
-
-
-  <groupId>io.github.penn-live</groupId>
-  <artifactId>framework-parent</artifactId>
-  <packaging>pom</packaging>
-  <version>1.0.1-RELEASE</version>
-  <name>framework-parent</name>
-  <modelVersion>4.0.0</modelVersion>
-  <url>https://github.com/Penn-Live/framework-parent</url>
-  <description>Capture Java</description>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starters</artifactId>
+        <version>2.2.7.RELEASE</version>
+    </parent>
 
 
-  <dependencies>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>1.16.10</version>
-    </dependency>
-
-
-    <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>18.0</version>
-    </dependency>
-
-  </dependencies>
-
-  <properties>
-    <version.spring>4.3.16.RELEASE</version.spring>
-  </properties>
-
-  <modules>
-    <module>framework-common</module>
-    <module>framework-rest-starter</module>
-    <module>framework-demo</module>
-  </modules>
-
-  <licenses>
-    <license>
-      <name>Server Side Public License</name>
-      <url>https://www.mongodb.com/licensing/server-side-public-license</url>
-      <distribution>repo</distribution>
-      <comments>A not business-friendly OSS license</comments>
-    </license>
-  </licenses>
-  <scm>
+    <groupId>io.github.penn-live</groupId>
+    <artifactId>framework-parent</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0.2-RELEASE</version>
+    <name>framework-parent</name>
+    <modelVersion>4.0.0</modelVersion>
     <url>https://github.com/Penn-Live/framework-parent</url>
-    <connection>https://github.com/Penn-Live/framework-parent.git</connection>
-  </scm>
+    <description>Capture Java</description>
 
-  <developers>
-    <developer>
-      <name>penn.z.tang</name>
-      <id>penn</id>
-      <email>penn.z.tang@gmail.com</email>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+8</timezone>
-    </developer>
-  </developers>
-  <profiles>
-    <profile>
-      <id>default</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <version>2.2.1</version>
-            <executions>
-              <execution>
-                <phase>package</phase>
-                <goals>
-                  <goal>jar-no-fork</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <configuration>
-              <!--suppress UnresolvedMavenProperty -->
-              <javadocExecutable>${JAVA_HOME}/bin/javadoc</javadocExecutable>
-              <additionalparam>-Xdoclint:none</additionalparam>
-            </configuration>
-            <version>2.9.1</version>
-            <executions>
-              <execution>
-                <phase>package</phase>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.6</version>
-            <executions>
-              <execution>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-      <distributionManagement>
-        <snapshotRepository>
-          <id>ossrh</id>
-          <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        </snapshotRepository>
-        <repository>
-          <id>ossrh</id>
-          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-      </distributionManagement>
-    </profile>
-  </profiles>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
+        </dependency>
+
+    </dependencies>
+
+    <properties>
+        <version.spring>4.3.16.RELEASE</version.spring>
+    </properties>
+
+    <modules>
+        <module>framework-common</module>
+        <module>framework-rest-starter</module>
+    </modules>
+
+    <licenses>
+        <license>
+            <name>Server Side Public License</name>
+            <url>https://www.mongodb.com/licensing/server-side-public-license</url>
+            <distribution>repo</distribution>
+            <comments>A not business-friendly OSS license</comments>
+        </license>
+    </licenses>
+    <scm>
+        <url>https://github.com/Penn-Live/framework-parent</url>
+        <connection>https://github.com/Penn-Live/framework-parent.git</connection>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>penn.z.tang</name>
+            <id>penn</id>
+            <email>penn.z.tang@gmail.com</email>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+8</timezone>
+        </developer>
+    </developers>
+    <profiles>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.2.1</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <!--suppress UnresolvedMavenProperty -->
+                            <javadocExecutable>${JAVA_HOME}/bin/javadoc</javadocExecutable>
+                            <additionalparam>-Xdoclint:none</additionalparam>
+                        </configuration>
+                        <version>2.9.1</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                </snapshotRepository>
+                <repository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 
 </project>

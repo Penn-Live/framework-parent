@@ -3,6 +3,7 @@ package io.github.penn.rest;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.web.client.RestTemplate;
 
 import java.lang.reflect.InvocationHandler;
@@ -19,6 +20,9 @@ public class RestServiceFactory<T> implements FactoryBean<T> {
     @Getter
     @Setter
     private RestTemplate restTemplate;
+    @Getter
+    @Setter
+    private ApplicationContext applicationContext;
 
     public RestServiceFactory(Class<T> interfaceType) {
         this.interfaceType = interfaceType;
@@ -27,7 +31,7 @@ public class RestServiceFactory<T> implements FactoryBean<T> {
     @Override
     public T getObject() throws Exception {
         //jkd proxy
-        InvocationHandler handler = new RestServiceProxy<>(interfaceType,restTemplate);
+        InvocationHandler handler = new RestServiceProxy<>(interfaceType,restTemplate,applicationContext);
         return (T) Proxy.newProxyInstance(interfaceType.getClassLoader(),
                 new Class[]{interfaceType}, handler);
     }

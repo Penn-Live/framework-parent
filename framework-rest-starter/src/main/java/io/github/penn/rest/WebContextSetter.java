@@ -26,7 +26,7 @@ public class WebContextSetter implements HandlerInterceptor {
             return true;
         }
 
-        log.info("parse request info for request method:{}", ((HandlerMethod) handler).getMethod().getName());
+        log.info("[WebContextSetter] parse request info for request method:{}", ((HandlerMethod) handler).getMethod().getName());
         //request
         CurrentRequestContext currentRequestContext = new CurrentRequestContext();
         currentRequestContext.setRequest(httpServletRequest);

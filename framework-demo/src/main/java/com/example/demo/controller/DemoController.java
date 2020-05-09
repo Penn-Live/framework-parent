@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.demo.rest.service.DemoRestService;
+import io.github.penn.rest.RestResponse;
 import io.github.penn.rest.context.WebContext;
 import io.github.penn.rest.WebJSON;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +27,9 @@ public class DemoController {
 
 
     @PostMapping("/demo2")
-    public JSONObject demo2() {
-
-        return demoRestService.demoMethod();
+    public RestResponse demo2() {
+        RestResponse<JSONObject> restResponse = demoRestService.demoMethod(WebJSON.newJSON().peekBodyParam("name"));
+        return restResponse;
     }
 
 }

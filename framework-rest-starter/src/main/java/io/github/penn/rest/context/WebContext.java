@@ -31,7 +31,7 @@ public class WebContext {
      */
     public static void addCurrentRequestContext(CurrentRequestContext currentRequestContext) {
         currentRequest.set(currentRequestContext);
-        log.info("set current request info: {}", currentRequestContext);
+        log.info("[WebContext] set current request info: {}", currentRequestContext.getBodyParams());
     }
 
 
