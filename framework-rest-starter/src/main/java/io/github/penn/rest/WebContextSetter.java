@@ -1,6 +1,7 @@
 package io.github.penn.rest;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONValidator;
 import io.github.penn.rest.context.CurrentRequestContext;
 import io.github.penn.rest.context.WebContext;
 import lombok.extern.slf4j.Slf4j;
@@ -20,52 +21,86 @@ import java.io.IOException;
 @Slf4j
 public class WebContextSetter implements HandlerInterceptor {
 
-    @Override
-    public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object handler) throws Exception {
-        if (!(handler instanceof HandlerMethod)) {
-            return true;
-        }
-
-        log.info("[WebContextSetter] parse request info for request method:{}", ((HandlerMethod) handler).getMethod().getName());
-        //request
-        CurrentRequestContext currentRequestContext = new CurrentRequestContext();
-        currentRequestContext.setRequest(httpServletRequest);
-        currentRequestContext.setSession(httpServletRequest.getSession());
-
-        //set web params
-        JSONObject bodyParams = parseBodyParams(httpServletRequest);
-        currentRequestContext.setBodyParams(bodyParams);
-
-        //add request
-        WebContext.addCurrentRequestContext(currentRequestContext);
-        return true;
+  @Override
+  public boolean preHandle(HttpServletRequest httpServletRequest,
+      HttpServletResponse httpServletResponse, Object handler) throws Exception {
+    if (!(handler instanceof HandlerMethod)) {
+      return true;
+    }
+    if (!ifSetWebContext((HandlerMethod) handler)) {
+      return true;
     }
 
+    log.info("[WebContextSetter] parse request info for request method:{}",
+        ((HandlerMethod) handler).getMethod().getName());
+    //request
+    CurrentRequestContext currentRequestContext = new CurrentRequestContext();
+    currentRequestContext.setRequest(httpServletRequest);
+    currentRequestContext.setSession(httpServletRequest.getSession());
 
+    //set web params
+    JSONObject bodyParams = parseBodyParams(httpServletRequest);
+    currentRequestContext.setBodyParams(bodyParams);
+
+    //add request
+    WebContext.addCurrentRequestContext(currentRequestContext);
+    return true;
+  }
+
+  /**
+   * if the web context need webContext
+   */
+  private boolean ifSetWebContext(HandlerMethod handlerMethod) {
+    InjectWebContext injectWebContext = handlerMethod.getMethod()
+        .getAnnotation(InjectWebContext.class);
+    if (injectWebContext != null) {
+      return true;
+    }
+    injectWebContext =
+        handlerMethod.getBeanType().getAnnotation(InjectWebContext.class);
+    if (injectWebContext != null) {
+      return true;
+    }
+    return false;
+  }
+
+
+  /**
+   * body params
+   */
+  private JSONObject parseBodyParams(HttpServletRequest httpServletRequest) {
+    try {
+      String bodyStr = IOUtils.toString(httpServletRequest.getReader());
+      // judge body str incase not json format.
+      if (JSONValidator.from(bodyStr).validate()) {
+        return JSONObject.parseObject(bodyStr);
+      }
+    } catch (IOException e) {
+      //error is all time thing
+    }
+    return new JSONObject();
+  }
+
+
+  @Override
+  public void postHandle(HttpServletRequest httpServletRequest,
+      HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView)
+      throws Exception {
     /**
-     * body params
+     * EMPTY
      */
-    private JSONObject parseBodyParams(HttpServletRequest httpServletRequest) {
-        try {
-            String bodyStr = IOUtils.toString(httpServletRequest.getReader());
-            //simple way
-            if (StringUtils.contains(bodyStr, "{")) {
-                return JSONObject.parseObject(bodyStr);
-            }
-        } catch (IOException e) {
-            //error is all time thing
-        }
-        return new JSONObject();
+  }
+
+
+  @Override
+  public void afterCompletion(HttpServletRequest httpServletRequest,
+      HttpServletResponse httpServletResponse,
+      Object handler, Exception e) throws Exception {
+    if (!ifSetWebContext((HandlerMethod) handler)) {
+      //release the object
+      log.info("[WebContextSetter] remove WebContext info for request method:{}",
+          ((HandlerMethod) handler).getMethod().getName());
+      WebContext.removeCurrentRequest();
     }
-
-
-    public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView) throws Exception {
-
-    }
-
-
-    public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {
-        //release the object
-        WebContext.removeCurrentRequest();
-    }
+  }
 }
