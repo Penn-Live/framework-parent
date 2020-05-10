@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>framework-rest-starter</artifactId>
-    <version>1.0.2-RELEASE</version>
+    <version>1.0.3-RELEASE</version>
     <packaging>jar</packaging>
     <modelVersion>4.0.0</modelVersion>
 
@@ -33,7 +33,7 @@
         <dependency>
             <artifactId>framework-common</artifactId>
             <groupId>io.github.penn-live</groupId>
-            <version>1.0.1-RELEASE</version>
+            <version>1.0.2-RELEASE</version>
         </dependency>
 
 
