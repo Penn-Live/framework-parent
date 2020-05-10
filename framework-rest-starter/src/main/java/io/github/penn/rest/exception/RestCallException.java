@@ -8,24 +8,25 @@ package io.github.penn.rest.exception;
  */
 public class RestCallException extends RuntimeException {
 
-    private static long serialVersionID = 1564897894316579464L;
+  private static long serialVersionID = 1564897894316579464L;
 
-    public RestCallException() {
-    }
+  public RestCallException() {
+  }
 
-    public RestCallException(String message) {
-        super(message);
-    }
+  public RestCallException(String message) {
+    super(message);
+  }
 
-    public RestCallException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public RestCallException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public RestCallException(Throwable cause) {
-        super(cause);
-    }
+  public RestCallException(Throwable cause) {
+    super(cause);
+  }
 
-    public RestCallException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
+  public RestCallException(String message, Throwable cause, boolean enableSuppression,
+      boolean writableStackTrace) {
+    super(message, cause, enableSuppression, writableStackTrace);
+  }
 }

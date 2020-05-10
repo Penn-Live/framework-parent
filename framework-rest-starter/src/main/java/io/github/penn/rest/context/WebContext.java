@@ -29,7 +29,7 @@ public class WebContext {
   /**
    * set a current request info
    */
-  private static void addCurrentRequestContext(CurrentRequestContext currentRequestContext) {
+  public static void addCurrentRequestContext(CurrentRequestContext currentRequestContext) {
     currentRequest.set(currentRequestContext);
     log.info("[WebContext] set current request info: {}", currentRequestContext.getBodyParams());
   }

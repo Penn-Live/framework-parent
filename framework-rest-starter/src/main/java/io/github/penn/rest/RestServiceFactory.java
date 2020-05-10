@@ -2,7 +2,6 @@ package io.github.penn.rest;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
-import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.FactoryBean;
 
@@ -15,9 +14,8 @@ public class RestServiceFactory<T> implements FactoryBean<T> {
     private Class<T> interfaceType;
 
     /**
-     * inject by application
+     * inject rest caller
      */
-    @Getter
     @Setter
     private RestCaller restCaller;
 
@@ -29,7 +27,8 @@ public class RestServiceFactory<T> implements FactoryBean<T> {
     @Override
     public T getObject() throws Exception {
         //jkd proxy
-        InvocationHandler handler = new RestServiceProxy<>(interfaceType,restCaller);
+        InvocationHandler handler =
+            new RestServiceProxy<>(interfaceType,restCaller);
         return (T) Proxy.newProxyInstance(interfaceType.getClassLoader(),
                 new Class[]{interfaceType}, handler);
     }

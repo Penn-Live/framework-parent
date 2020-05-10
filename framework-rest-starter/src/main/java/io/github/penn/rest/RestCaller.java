@@ -20,15 +20,14 @@ import org.springframework.web.client.RestTemplate;
  *
  * @author penn
  */
-@Component
 @Slf4j
+@Component
 public class RestCaller {
 
   @Autowired
   private RestTemplate restTemplate;
   @Autowired
   private ApplicationContext applicationContext;
-
 
 
   //todo:下个版本做校验，现在只约定
@@ -68,35 +67,42 @@ public class RestCaller {
 
   public RestResponse<JSONObject> restCall(RequestContext context) {
     RestResponse<JSONObject> restResponse = new RestResponse<>();
+    int reqeustId = context.hashCode();
     try {
-      log.info("[REST-CALL-START] METHOD:{}, \n URL: {}, \n PARAMS: {}",
-          context.getHttpMethod(), context.getCompletedUrl(), JSONObject.toJSONString(context.getParams()));
+      log.info("\n[REST-CALL-START-{}]\nMETHOD:{}, URL: {} \nPARAMS: {}",
+          reqeustId, context.getHttpMethod(), context.getCompletedUrl(),
+          JSONObject.toJSONString(context.getParams()));
       JSONObject jsonObject = doRestCall(context);
       restResponse.setResponse(jsonObject);
     } catch (Exception e) {
       restResponse.setIfCallException(true);
       restResponse.setException(new RestCallException(e));
     }
-    log.info("[REST-CALL-END] METHOD:{}, \n URL: {}, \n  IF-CALL-EXCEPTION: {}, \n EXCEPTION:{} \n RESP: {}",
-        context.getHttpMethod(), context.getCompletedUrl(),
-        restResponse.getIfCallException(),restResponse.getException(),restResponse.getException());
+//    log.info(
+//        "\n[REST-CALL-END-{}]\nMETHOD:{}, URL: {}  \nIF-CALL-EXCEPTION: {} \nEXCEPTION:{} \nRESP: {}",
+//        reqeustId, context.getHttpMethod(), context.getCompletedUrl(),
+//        restResponse.getIfCallException(), restResponse.getException(),
+//        restResponse.getResponse());
     return restResponse;
   }
 
   private JSONObject doRestCall(RequestContext context) {
     switch (context.getHttpMethod()) {
       case GET: {
-        return restTemplate.getForObject(context.getCompletedUrl(), JSONObject.class, context.getParams());
+        return restTemplate
+            .getForObject(context.getCompletedUrl(), JSONObject.class, context.getParams());
       }
       case POST: {
-        return restTemplate.postForObject(context.getCompletedUrl(), context.getParams(), JSONObject.class);
+        return restTemplate
+            .postForObject(context.getCompletedUrl(), context.getParams(), JSONObject.class);
+      }
+      default: {
+        log.warn("not support http method method: {}, context: {}", context.getHttpMethod(),
+            context);
       }
     }
     return WebJSON.newJSON().addParam("error", "not support method.");
   }
-
-
-
 
 
 }

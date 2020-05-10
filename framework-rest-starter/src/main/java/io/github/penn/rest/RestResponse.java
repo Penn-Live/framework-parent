@@ -1,9 +1,9 @@
 package io.github.penn.rest;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.github.penn.rest.exception.RestCallException;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 /**
  * Rest Response
@@ -12,18 +12,26 @@ import lombok.ToString;
  */
 @Getter
 @Setter
-@ToString
+@JsonIgnoreProperties("exception")
 public class RestResponse<T> {
 
-    /**
-     * if the call rpc exception
-     */
-    private Boolean ifCallException = false;
+  /**
+   * if the call rpc exception
+   */
+  private Boolean ifCallException = false;
 
-    T response;
+  T response;
 
-    private RestCallException exception;
+  private RestCallException exception;
 
+  @Override
+  public String toString() {
+    return "RestResponse{" +
+        "ifCallException=" + ifCallException +
+        ", response=" + response +
+        ", exception=" + (exception==null?"null":exception.getLocalizedMessage()) +
+        '}';
+  }
 }
 
 

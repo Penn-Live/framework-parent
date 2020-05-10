@@ -72,7 +72,8 @@ public class WebContextSetter implements HandlerInterceptor {
     try {
       String bodyStr = IOUtils.toString(httpServletRequest.getReader());
       // judge body str incase not json format.
-      if (JSONValidator.from(bodyStr).validate()) {
+      if (StringUtils.isNotEmpty(bodyStr)
+          && JSONValidator.from(bodyStr).validate()) {
         return JSONObject.parseObject(bodyStr);
       }
     } catch (IOException e) {
@@ -96,7 +97,7 @@ public class WebContextSetter implements HandlerInterceptor {
   public void afterCompletion(HttpServletRequest httpServletRequest,
       HttpServletResponse httpServletResponse,
       Object handler, Exception e) throws Exception {
-    if (!ifSetWebContext((HandlerMethod) handler)) {
+    if (ifSetWebContext((HandlerMethod) handler)) {
       //release the object
       log.info("[WebContextSetter] remove WebContext info for request method:{}",
           ((HandlerMethod) handler).getMethod().getName());

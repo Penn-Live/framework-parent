@@ -75,6 +75,7 @@ public class RestServiceBeanContext implements ResourceLoaderAware, ApplicationC
             log.info("[rest-service] complete init rest services");
         } catch (Exception e) {
             //
+            e.printStackTrace();
         }
         return this;
     }
@@ -159,7 +160,12 @@ public class RestServiceBeanContext implements ResourceLoaderAware, ApplicationC
      */
     private List<String> formatPaths(List<String> paths) {
         if (!CollectionUtils.isEmpty(paths)) {
-            return paths.stream().map(p -> String.format(PACKAGE_FORMAT, p)).collect(Collectors.toList());
+            return paths.stream()
+                .map(p -> {
+                    p = p.replace(".", "/");
+                    return String.format(PACKAGE_FORMAT, p);
+                })
+                .collect(Collectors.toList());
         }
         return Collections.emptyList();
     }
