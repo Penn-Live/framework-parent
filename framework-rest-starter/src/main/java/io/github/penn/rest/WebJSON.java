@@ -23,6 +23,11 @@ public class WebJSON extends JSONObject {
         return this;
     }
 
+    public WebJSON transBodyParamName(String from,String to){
+        this.put(to, WebContext.getBodyParamJSON().get(from));
+        return this;
+    }
+
 
     public WebJSON addParam(String name, Object value) {
         this.put(name, value);

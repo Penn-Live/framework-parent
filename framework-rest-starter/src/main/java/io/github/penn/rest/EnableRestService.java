@@ -21,6 +21,6 @@ public @interface EnableRestService {
    *
    * @return
    */
-  String[] serviceBasePackage() default {};
+  String[] basePackage() default {};
 
 }

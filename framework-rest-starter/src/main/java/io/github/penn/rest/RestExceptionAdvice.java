@@ -2,6 +2,7 @@ package io.github.penn.rest;
 
 import com.alibaba.fastjson.JSONObject;
 import io.github.penn.rest.exception.InvalidParamException;
+import io.github.penn.rest.exception.RestCallException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,6 +27,20 @@ public class RestExceptionAdvice {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("retCode", 99);
         jsonObject.put("retMsg", invalidParamException.getMessage());
+        return jsonObject;
+    }
+
+    /**
+     * RestCallException
+     */
+    @ExceptionHandler({RestCallException.class})
+    public JSONObject handleRestCallException(RestCallException restCallException){
+        if (restCallException.getExceptionDesc()!=null) {
+            return restCallException.getExceptionDesc();
+        }
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("retCode", 99);
+        jsonObject.put("retMsg", restCallException.getMessage());
         return jsonObject;
     }
 

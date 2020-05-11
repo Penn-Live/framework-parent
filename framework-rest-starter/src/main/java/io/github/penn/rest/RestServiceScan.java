@@ -21,6 +21,6 @@ public @interface RestServiceScan {
    *
    * @return
    */
-  String[] serviceBasePackage() default {};
+  String[] basePackage() default {};
 
 }

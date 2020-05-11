@@ -1,16 +1,14 @@
 package io.github.penn.rest;
 
 import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.github.penn.rest.call.RestService;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +16,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ResourceLoaderAware;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -29,8 +28,7 @@ import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.util.ClassUtils;
 
 import java.io.IOException;
-import java.util.LinkedHashSet;
-import java.util.Set;
+
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -46,8 +44,8 @@ public class RestServiceBeanContext implements ResourceLoaderAware, ApplicationC
 
     private static final String DEFAULT_RESOURCE_PATTERN = "**/*.class";
 
-    private String PACKAGE_FORMAT=
-        ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +"%s"+"/" + DEFAULT_RESOURCE_PATTERN;
+    private String PACKAGE_FORMAT =
+            ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "%s" + "/" + DEFAULT_RESOURCE_PATTERN;
 
     /**
      * all rest classes
@@ -87,14 +85,15 @@ public class RestServiceBeanContext implements ResourceLoaderAware, ApplicationC
         Set<Class<?>> classSet = new LinkedHashSet<>();
         List<String> serviceClassPath = resolveBasePackage();
         for (String path : serviceClassPath) {
-            classSet.addAll(loadConditionClass(path,this::ifValidRestServiceBean));
+            classSet.addAll(loadConditionClass(path, this::ifValidRestServiceBean));
         }
-        log.info("[rest-service] load all rest service interface: {}",classSet);
+        log.info("[rest-service] load all rest service interface: {}", classSet);
         return classSet;
     }
 
     /**
      * load rest service
+     *
      * @param path
      * @return
      */
@@ -107,7 +106,7 @@ public class RestServiceBeanContext implements ResourceLoaderAware, ApplicationC
                     MetadataReader metadataReader = this.metadataReaderFactory.getMetadataReader(resource);
                     String className = metadataReader.getClassMetadata().getClassName();
                     try {
-                        Class<?> clazz = Class.forName(className);
+                        Class<?> clazz = org.apache.commons.lang3.ClassUtils.getClass(className, false);
                         if (clazzPredicate.test(clazz)) {
                             classSet.add(clazz);
                         }
@@ -125,49 +124,52 @@ public class RestServiceBeanContext implements ResourceLoaderAware, ApplicationC
 
     /**
      * resolveBase package
+     *
      * @return
      */
     private List<String> resolveBasePackage() {
-       //try load from properties
+        //try load from properties
         String path = getEnvironment().getProperty("framework.rest.service-path");
         if (StringUtils.isNotEmpty(path)) {
             List<String> paths = Splitter.on(",").trimResults().omitEmptyStrings()
-                .splitToList(path);
+                    .splitToList(path);
             return formatPaths(paths);
 
         }
 
-
         //try annotation
-        ArrayList<String> packages = Lists.newArrayList();
-        Set<Class<?>> configClass = loadConditionClass("com", this::ifValidRestBasePackageScan);
-        for (Class<?> aClass : configClass) {
-            RestServiceScan restServiceScan = aClass.getAnnotation(RestServiceScan.class);
-            if (restServiceScan != null) {
-                packages.addAll(Arrays.asList(restServiceScan.serviceBasePackage()));
-            }
-            EnableRestService  restService = aClass.getAnnotation(EnableRestService.class);
-            if (restService != null) {
-                packages.addAll(Arrays.asList(restService.serviceBasePackage()));
-            }
+        Set<String> packages = Sets.newHashSet();
+        Map<String, Object> beansWithRestService = applicationContext.getBeansWithAnnotation(EnableRestService.class);
+        for (Object value : beansWithRestService.values()) {
+            EnableRestService annotation = AnnotationUtils.getAnnotation(value.getClass(), EnableRestService.class);
+            packages.addAll(Arrays.asList(annotation.basePackage()));
         }
-        log.info("[rest-service] parse base packages: {}",packages);
+        Map<String, Object> beansWithRestScan = applicationContext.getBeansWithAnnotation(RestServiceScan.class);
+        for (Object value : beansWithRestScan.values()) {
+            RestServiceScan annotation = AnnotationUtils.getAnnotation(value.getClass(), RestServiceScan.class);
+            packages.addAll(Arrays.asList(annotation.basePackage()));
+        }
+
+        log.info("[rest-service] parse base packages: {}", packages);
         return formatPaths(packages);
     }
 
     /**
      * format paths
      */
-    private List<String> formatPaths(List<String> paths) {
+    private List<String> formatPaths(Collection<String> paths) {
         if (!CollectionUtils.isEmpty(paths)) {
             return paths.stream()
-                .map(p -> {
-                    p = p.replace(".", "/");
-                    return String.format(PACKAGE_FORMAT, p);
-                })
-                .collect(Collectors.toList());
+                    .map(this::formatPath)
+                    .collect(Collectors.toList());
         }
         return Collections.emptyList();
+    }
+
+
+    private String formatPath(String path){
+        path = path.replace(".", "/");
+        return String.format(PACKAGE_FORMAT,path);
     }
 
 
@@ -188,12 +190,13 @@ public class RestServiceBeanContext implements ResourceLoaderAware, ApplicationC
 
     /**
      * if this class a rest servce package scane
+     *
      * @param clazz
      * @return
      */
     private boolean ifValidRestBasePackageScan(Class<?> clazz) {
-        return (clazz.getAnnotation(RestServiceScan.class)!=null
-            ||clazz.getAnnotation(EnableRestService.class)!=null);
+        return (clazz.getAnnotation(RestServiceScan.class) != null
+                || clazz.getAnnotation(EnableRestService.class) != null);
     }
 
     protected String resolveBasePackage(String basePackage) {
