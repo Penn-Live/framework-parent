@@ -33,7 +33,7 @@
         <dependency>
             <artifactId>framework-common</artifactId>
             <groupId>io.github.penn-live</groupId>
-            <version>1.0.1-RELEASE</version>
+            <version>1.0.2-RELEASE</version>
         </dependency>
 
 
