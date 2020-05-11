@@ -111,7 +111,7 @@ public class RestServiceBeanContext implements ResourceLoaderAware, ApplicationC
                         if (clazzPredicate.test(clazz)) {
                             classSet.add(clazz);
                         }
-                    } catch (ClassNotFoundException e) {
+                    } catch (Exception e) {
                         //skip
                         log.warn("[rest-service] class not found, name: {}, ex: {}", className, e);
                     }
