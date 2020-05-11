@@ -101,7 +101,7 @@ public class RestCaller {
             context);
       }
     }
-    return WebJSON.newJSON().addParam("error", "not support method.");
+    return WebJSON.fromWebContext().addParam("error", "not support method.");
   }
 
 

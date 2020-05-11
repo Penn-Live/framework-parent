@@ -25,7 +25,7 @@ public class DemoController {
         //WebContext.bodyParamMustHas("name", "abc");
         HttpServletRequest request = WebContext.getRequest();
 
-        return WebJSON.newJSON()
+        return WebJSON.fromWebContext()
                 .peekBodyParam("name")
                 .peekBodyParam("age");
     }
@@ -33,7 +33,7 @@ public class DemoController {
 
     @PostMapping("/demo2")
     public RestResponse demo2() {
-        RestResponse<JSONObject> restResponse = demoRestService.demoMethod(WebJSON.newJSON().peekBodyParam("name"));
+        RestResponse<JSONObject> restResponse = demoRestService.demoMethod(WebJSON.fromWebContext().peekBodyParam("name"));
         return restResponse;
     }
 

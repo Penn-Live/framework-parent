@@ -8,23 +8,36 @@ import io.github.penn.rest.context.WebContext;
  */
 public class WebJSON extends JSONObject {
 
+    private JSONObject source;
 
     private WebJSON() {
     }
 
+    private WebJSON(JSONObject jsonObject) {
+        this.source = jsonObject;
+    }
 
-    public static WebJSON newJSON() {
-        return new WebJSON();
+
+    public static WebJSON fromWebContext() {
+        return from(WebContext.getBodyParamJSON());
+    }
+
+    public static WebJSON newJSON(){
+        return from(new JSONObject());
+    }
+
+    public static WebJSON from(JSONObject jsonObject) {
+        return new WebJSON(jsonObject);
     }
 
 
     public WebJSON peekBodyParam(String name) {
-        this.put(name, WebContext.getBodyParamJSON().get(name));
+        this.put(name, source.get(name));
         return this;
     }
 
-    public WebJSON transBodyParamName(String from,String to){
-        this.put(to, WebContext.getBodyParamJSON().get(from));
+    public WebJSON transBodyParamName(String from, String to) {
+        this.put(to, source.get(from));
         return this;
     }
 
