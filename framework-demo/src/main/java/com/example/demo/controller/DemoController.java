@@ -9,6 +9,7 @@ import io.github.penn.rest.WebJSON;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,7 +33,8 @@ public class DemoController {
 
 
     @PostMapping("/demo2")
-    public RestResponse demo2() {
+    @InjectWebContext
+    public RestResponse demo2(@RequestBody JSONObject jsonObject) {
         RestResponse<JSONObject> restResponse = demoRestService.demoMethod(WebJSON.fromWebContext().peekBodyParam("name"));
         return restResponse;
     }
