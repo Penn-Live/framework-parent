@@ -1,16 +1,13 @@
 package io.github.penn.rest;
 
-import lombok.Setter;
+import java.util.Set;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.stereotype.Component;
-
-import java.util.Set;
 
 /**
  * def the rest service bean
@@ -31,8 +28,6 @@ public class RestServiceDefinitionRegistry extends RestServiceBeanContext
 
             definition.getConstructorArgumentValues().addGenericArgumentValue(beanClazz);
             definition.setBeanClass(RestServiceFactory.class);
-            //inject rest template
-           // definition.setAttribute("restTemplate", restTemplate);
 
             definition.setAutowireMode(GenericBeanDefinition.AUTOWIRE_BY_TYPE);
             registry.registerBeanDefinition(beanClazz.getSimpleName(), definition);

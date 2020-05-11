@@ -2,9 +2,11 @@ package com.example.demo.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.demo.rest.service.DemoRestService;
+import io.github.penn.rest.InjectWebContext;
 import io.github.penn.rest.RestResponse;
 import io.github.penn.rest.context.WebContext;
 import io.github.penn.rest.WebJSON;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,8 +20,11 @@ public class DemoController {
     private DemoRestService demoRestService;
 
     @PostMapping("/demo")
+    @InjectWebContext
     public JSONObject demo() {
-        WebContext.bodyParamMustHas("name", "abc");
+        //WebContext.bodyParamMustHas("name", "abc");
+        HttpServletRequest request = WebContext.getRequest();
+
         return WebJSON.newJSON()
                 .peekBodyParam("name")
                 .peekBodyParam("age");

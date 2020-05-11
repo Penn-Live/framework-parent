@@ -1,13 +1,9 @@
 package io.github.penn.rest;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.client.RestTemplate;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
+import lombok.Setter;
+import org.springframework.beans.factory.FactoryBean;
 
 /**
  * @author tangzhongping
@@ -17,12 +13,12 @@ public class RestServiceFactory<T> implements FactoryBean<T> {
 
     private Class<T> interfaceType;
 
-    @Getter
+    /**
+     * inject rest caller
+     */
     @Setter
-    private RestTemplate restTemplate;
-    @Getter
-    @Setter
-    private ApplicationContext applicationContext;
+    private RestCaller restCaller;
+
 
     public RestServiceFactory(Class<T> interfaceType) {
         this.interfaceType = interfaceType;
@@ -31,7 +27,8 @@ public class RestServiceFactory<T> implements FactoryBean<T> {
     @Override
     public T getObject() throws Exception {
         //jkd proxy
-        InvocationHandler handler = new RestServiceProxy<>(interfaceType,restTemplate,applicationContext);
+        InvocationHandler handler =
+            new RestServiceProxy<>(interfaceType,restCaller);
         return (T) Proxy.newProxyInstance(interfaceType.getClassLoader(),
                 new Class[]{interfaceType}, handler);
     }
