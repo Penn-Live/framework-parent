@@ -16,4 +16,9 @@ public @interface RestService {
      *
      */
     String domain() default "";
+
+    /**
+     * what template using for request
+     */
+    String restTemplate() default "restTemplate";
 }

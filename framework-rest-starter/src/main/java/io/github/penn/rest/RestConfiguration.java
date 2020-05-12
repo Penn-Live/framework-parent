@@ -1,7 +1,10 @@
 package io.github.penn.rest;
 
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.List;
 
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -9,7 +12,9 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -26,7 +31,7 @@ public class RestConfiguration extends WebMvcConfigurationSupport {
 
     @Bean
     @ConditionalOnMissingBean
-    public RequestCondition requestCondition(){
+    public RequestCondition requestCondition() {
         return new RequestCondition();
     }
 
@@ -49,13 +54,14 @@ public class RestConfiguration extends WebMvcConfigurationSupport {
         return registration;
     }
 
+
+
     @Bean("restTemplate")
     @ConditionalOnMissingBean
     public RestTemplate restTemplate() {
         RestTemplate restTemplate = new RestTemplate();
         return restTemplate;
     }
-
 
     @Override
     public void addInterceptors(InterceptorRegistry interceptorRegistry) {
@@ -65,3 +71,6 @@ public class RestConfiguration extends WebMvcConfigurationSupport {
 
 
 }
+
+
+

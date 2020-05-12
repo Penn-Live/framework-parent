@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.http.HttpMethod;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * request context
@@ -28,6 +29,11 @@ public class RequestContext {
      * method
      */
     private HttpMethod httpMethod;
+
+    /**
+     * which rest Template to use
+     */
+    private RestTemplate restTemplate;
 
 
 }
