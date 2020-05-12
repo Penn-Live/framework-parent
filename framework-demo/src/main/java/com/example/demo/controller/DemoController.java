@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/penn")
+@InjectWebContext
 public class DemoController {
 
     @Autowired
     private DemoRestService demoRestService;
 
     @PostMapping("/demo")
-    @InjectWebContext
     public JSONObject demo() {
         //WebContext.bodyParamMustHas("name", "abc");
         HttpServletRequest request = WebContext.getRequest();
@@ -33,10 +33,14 @@ public class DemoController {
 
 
     @PostMapping("/demo2")
-    @InjectWebContext
     public RestResponse demo2(@RequestBody JSONObject jsonObject) {
         RestResponse<JSONObject> restResponse = demoRestService.demoMethod(WebJSON.fromWebContext().peekBodyParam("name"));
         return restResponse;
+    }
+
+    @PostMapping("/demo3")
+    public RestResponse demo3(@RequestBody JSONObject jsonObject){
+        return new RestResponse();
     }
 
 }

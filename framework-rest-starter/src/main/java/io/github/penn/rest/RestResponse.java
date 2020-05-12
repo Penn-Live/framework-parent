@@ -6,6 +6,8 @@ import io.github.penn.rest.exception.RestCallException;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 /**
  * Rest Response
  *
@@ -14,7 +16,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonIgnoreProperties("exception")
-public class RestResponse<T> {
+public class RestResponse<T> implements Serializable {
+
+    private static final long serialVersionUID = -3042686055658047285L;
 
     /**
      * if the call rpc exception
