@@ -53,7 +53,7 @@ public class CurrentRequestContext {
                     && JSONValidator.from(bodyStr).validate()) {
                 return JSONObject.parseObject(bodyStr);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             //error is all time thing
         }
         return new JSONObject();

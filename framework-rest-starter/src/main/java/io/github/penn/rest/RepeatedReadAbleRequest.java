@@ -22,7 +22,8 @@ public class RepeatedReadAbleRequest extends HttpServletRequestWrapper {
     public RepeatedReadAbleRequest(HttpServletRequest request) {
         super(request);
         try {
-            this.body = IOUtils.toByteArray(request.getReader());
+
+            this.body = IOUtils.toByteArray(request.getInputStream());
         } catch (IOException e) {
             log.error("error trans body reader to byte array.");
         }
@@ -30,13 +31,16 @@ public class RepeatedReadAbleRequest extends HttpServletRequestWrapper {
 
     @Override
     public BufferedReader getReader() throws IOException {
+
         return new BufferedReader(new InputStreamReader(this.getInputStream()));
     }
+
 
 
     @Override
     public ServletInputStream getInputStream() throws IOException {
         final ByteArrayInputStream bodyByteInputStream = new ByteArrayInputStream(body);
+
         return new ServletInputStream() {
             @Override
             public int read() throws IOException {

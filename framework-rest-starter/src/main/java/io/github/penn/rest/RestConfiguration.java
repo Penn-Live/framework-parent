@@ -45,7 +45,7 @@ public class RestConfiguration extends WebMvcConfigurationSupport {
         registration.setFilter(webContextSetter());
         registration.addUrlPatterns("/*");
         registration.setName("httpServletRequestTransFilter");
-        registration.setOrder(1);
+        registration.setOrder(Integer.MIN_VALUE);
         return registration;
     }
 
