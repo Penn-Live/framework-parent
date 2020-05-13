@@ -43,4 +43,10 @@ public class DemoController {
         return new RestResponse();
     }
 
+    @PostMapping("/demo4")
+    public RestResponse demo4(@RequestBody JSONObject jsonObject) {
+        RestResponse<JSONObject> restResponse = demoRestService.demoMethod2(WebJSON.fromWebContext().peekBodyParam("name"));
+        return restResponse;
+    }
+
 }

@@ -10,9 +10,11 @@ import io.github.penn.rest.exception.RestCallException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.HttpUrl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -129,7 +131,7 @@ public class RestCaller {
         switch (context.getHttpMethod()) {
             case GET: {
                 return context.getRestTemplate()
-                        .getForObject(context.getCompletedUrl(), JSONObject.class, context.getParams());
+                        .getForObject(constructUrl(context), JSONObject.class);
             }
             case POST: {
                 return context.getRestTemplate()
@@ -141,6 +143,19 @@ public class RestCaller {
             }
         }
         return WebJSON.fromWebContext().addParam("error", "not support method.");
+    }
+
+    /**
+     * construct url
+     */
+    private String constructUrl(RequestContext context) {
+        HttpUrl.Builder builder = HttpUrl.get(context.getCompletedUrl()).newBuilder();
+        Map<String, Object> paramsMap =
+                context.getParams().getInnerMap();
+        paramsMap.forEach((name, value) ->
+                builder.addQueryParameter(name, String.valueOf(value)));
+        return builder.toString();
+
     }
 
 
