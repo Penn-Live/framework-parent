@@ -3,6 +3,8 @@ package io.github.penn.rest;
 import com.alibaba.fastjson.JSONObject;
 import io.github.penn.rest.context.WebContext;
 
+import java.util.function.Function;
+
 /**
  * @author tangzhongping
  */
@@ -22,7 +24,7 @@ public class WebJSON extends JSONObject {
         return from(WebContext.getBodyParamJSON());
     }
 
-    public static WebJSON newJSON(){
+    public static WebJSON newJSON() {
         return from(new JSONObject());
     }
 
@@ -38,6 +40,12 @@ public class WebJSON extends JSONObject {
 
     public WebJSON transBodyParamName(String from, String to) {
         this.put(to, source.get(from));
+        return this;
+    }
+
+    public WebJSON transBodyParamName(String from, String to, Function<Object, Object> transFun) {
+        Object source = this.source.get(from);
+        this.put(to, transFun.apply(source));
         return this;
     }
 
