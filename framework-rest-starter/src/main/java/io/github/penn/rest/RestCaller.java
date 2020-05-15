@@ -67,8 +67,8 @@ public class RestCaller {
             requestContext.setHttpMethod(HttpMethod.POST);
         }
 
-        String completeUrl = StringUtils.removeEnd(restServiceAnno.domain(), "/") + "/"
-                + StringUtils.removeStart(path, "/");
+        String completeUrl = StringUtils.removeEnd(restServiceAnno.domain().trim(), "/") + "/"
+                + StringUtils.removeStart(path.trim(), "/");
         //resolvePlaceholders
         completeUrl = resolvePlaceHolder(completeUrl);
         requestContext.setCompletedUrl(completeUrl);
