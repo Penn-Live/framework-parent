@@ -88,9 +88,17 @@ public class RestCaller {
      */
     private RestTemplate parseRestTemplate(RestService restServiceAnno) {
         String restBeanName = resolvePlaceHolder(restServiceAnno.restTemplate());
-        //resolve the name if has placeholder
-        RestTemplate restTemplate = applicationContext.getBean(restBeanName, RestTemplate.class);
-        if (restTemplate != null) {
+        RestTemplate restTemplate;
+        if (StringUtils.isNotEmpty(restBeanName)) {
+            //resolve the name if has placeholder
+            restTemplate = applicationContext.getBean(restBeanName, RestTemplate.class);
+            if (restTemplate != null) {
+                return restTemplate;
+            }
+        }
+        //try defaults
+        restTemplate = applicationContext.getBean(RestTemplate.class);
+        if (restTemplate!=null) {
             return restTemplate;
         }
         // try defaults
