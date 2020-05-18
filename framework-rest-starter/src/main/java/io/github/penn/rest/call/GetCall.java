@@ -10,6 +10,14 @@ import java.lang.annotation.*;
 @Documented
 public @interface GetCall {
 
+    /**
+     * service path
+     */
     String path() default "";
+
+    /**
+     * hits for rest service
+     */
+    String hint() default "";
 
 }

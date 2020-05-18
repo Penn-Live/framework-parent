@@ -1,18 +1,7 @@
 package io.github.penn.rest;
 
-import com.alibaba.fastjson.JSONObject;
-import io.github.penn.rest.call.GetCall;
-import io.github.penn.rest.call.PostCall;
-import io.github.penn.rest.call.RestService;
-import io.github.penn.rest.exception.RestCallException;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.ApplicationContext;
-import org.springframework.http.HttpMethod;
-import org.springframework.web.client.RestTemplate;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
@@ -25,11 +14,11 @@ import java.lang.reflect.Method;
 public class RestServiceProxy<T> implements InvocationHandler {
 
     private Class<T> interfaceType;
-    private RestCaller restCaller;
+    private RestServiceCaller restServiceCaller;
 
-    public RestServiceProxy(Class<T> interfaceType, RestCaller restCaller) {
+    public RestServiceProxy(Class<T> interfaceType, RestServiceCaller restServiceCaller) {
         this.interfaceType = interfaceType;
-         this.restCaller=restCaller;
+         this.restServiceCaller = restServiceCaller;
     }
 
     @Override
@@ -38,8 +27,8 @@ public class RestServiceProxy<T> implements InvocationHandler {
             return method.invoke(this, args);
         }
         //parse the request context
-        RequestContext requestContext = restCaller.parseRequestContext(method, args);
+        RequestContext requestContext = restServiceCaller.parseRequestContext(method, args);
         //call request context
-        return restCaller.restCall(requestContext);
+        return restServiceCaller.restCall(requestContext);
     }
 }

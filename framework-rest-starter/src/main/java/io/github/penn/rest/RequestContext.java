@@ -36,4 +36,15 @@ public class RequestContext {
     private RestTemplate restTemplate;
 
 
+    /**
+     * return type
+     */
+    private Class<?> returnType;
+
+    /**
+     * hint
+     */
+    private String hint;
+
+
 }

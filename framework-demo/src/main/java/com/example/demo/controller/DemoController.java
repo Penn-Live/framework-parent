@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.example.demo.model.DemoResponse;
 import com.example.demo.rest.service.DemoRestService;
 import io.github.penn.rest.InjectWebContext;
 import io.github.penn.rest.RestResponse;
@@ -22,19 +23,21 @@ public class DemoController {
     private DemoRestService demoRestService;
 
     @PostMapping("/demo")
-    public JSONObject demo() {
+    public DemoResponse demo() {
         //WebContext.bodyParamMustHas("name", "abc");
         HttpServletRequest request = WebContext.getRequest();
 
-        return WebJSON.fromWebContext()
+        WebJSON webJSON = WebJSON.fromWebContext()
                 .peekBodyParam("name")
                 .peekBodyParam("age");
+        RestResponse<DemoResponse> restResponse = demoRestService.demoMethod(webJSON);
+        return restResponse.getResponse();
     }
 
 
     @PostMapping("/demo2")
     public RestResponse demo2(@RequestBody JSONObject jsonObject) {
-        RestResponse<JSONObject> restResponse = demoRestService.demoMethod(WebJSON.fromWebContext().peekBodyParam("name"));
+        RestResponse<DemoResponse> restResponse = demoRestService.demoMethod(WebJSON.fromWebContext().peekBodyParam("name"));
         return restResponse;
     }
 

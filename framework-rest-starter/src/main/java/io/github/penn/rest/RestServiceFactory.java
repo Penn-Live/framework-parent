@@ -17,7 +17,7 @@ public class RestServiceFactory<T> implements FactoryBean<T> {
      * inject rest caller
      */
     @Setter
-    private RestCaller restCaller;
+    private RestServiceCaller restServiceCaller;
 
 
     public RestServiceFactory(Class<T> interfaceType) {
@@ -28,7 +28,7 @@ public class RestServiceFactory<T> implements FactoryBean<T> {
     public T getObject() throws Exception {
         //jkd proxy
         InvocationHandler handler =
-            new RestServiceProxy<>(interfaceType,restCaller);
+            new RestServiceProxy<>(interfaceType, restServiceCaller);
         return (T) Proxy.newProxyInstance(interfaceType.getClassLoader(),
                 new Class[]{interfaceType}, handler);
     }

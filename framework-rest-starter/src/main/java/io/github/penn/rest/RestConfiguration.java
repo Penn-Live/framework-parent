@@ -42,6 +42,12 @@ public class RestConfiguration extends WebMvcConfigurationSupport {
         return new WebContextSetter(requestCondition());
     }
 
+    @Bean("relayHandler")
+    @ConditionalOnMissingBean
+    public RelayHandler relayHandler(RelayCaller relayCaller, List<IRestRepeater> restRepeaters) {
+        return new RelayHandler(relayCaller, restRepeaters);
+    }
+
 
     @Bean
     @ConditionalOnMissingBean
@@ -50,10 +56,20 @@ public class RestConfiguration extends WebMvcConfigurationSupport {
         registration.setFilter(webContextSetter());
         registration.addUrlPatterns("/*");
         registration.setName("httpServletRequestTransFilter");
-        registration.setOrder(Integer.MIN_VALUE);
         return registration;
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public FilterRegistrationBean relayRequestTransFilter(RelayHandler relayHandler) {
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setFilter(relayHandler);
+        registration.addUrlPatterns("/*");
+        registration.setName("relayRequestTransFilter");
+        //after httpServletRequestTransFilter
+        registration.setOrder(Integer.MIN_VALUE );
+        return registration;
+    }
 
 
     @Bean("restTemplate")

@@ -10,12 +10,16 @@ import io.github.penn.rest.exception.RestCallException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpMethod;
@@ -29,7 +33,7 @@ import org.springframework.web.client.RestTemplate;
  */
 @Slf4j
 @Component
-public class RestCaller {
+public class RestServiceCaller {
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -38,7 +42,7 @@ public class RestCaller {
             CacheBuilder.newBuilder().build();
 
     //todo:下个版本做校验，现在只约定
-    public RequestContext parseRequestContext(Method method, Object[] args) {
+    public RequestContext parseRequestContext(Method method, Object[] args) throws ClassNotFoundException {
         RequestContext requestContext = new RequestContext();
 
         RestService restServiceAnno =
@@ -55,16 +59,24 @@ public class RestCaller {
 
         Annotation restCallAnno = method.getDeclaredAnnotations()[0];
         String path = "";
+
+        //parse return class
+        Class<?> returnClass = parseReturnClass(method);
+        requestContext.setReturnType(returnClass);
+
+        //http method
         if (GetCall.class.equals(restCallAnno.annotationType())) {
             GetCall getCall = (GetCall) restCallAnno;
             path = getCall.path();
             requestContext.setHttpMethod(HttpMethod.GET);
+            requestContext.setHint(getCall.hint());
         }
 
         if (PostCall.class.equals(restCallAnno.annotationType())) {
             PostCall postCall = (PostCall) restCallAnno;
             path = postCall.path();
             requestContext.setHttpMethod(HttpMethod.POST);
+            requestContext.setHint(postCall.hint());
         }
 
         String completeUrl = StringUtils.removeEnd(restServiceAnno.domain().trim(), "/") + "/"
@@ -78,6 +90,19 @@ public class RestCaller {
             requestContext.setParams(new JSONObject());
         }
         return requestContext;
+    }
+
+    /**
+     * parse return class
+     */
+    private Class parseReturnClass(Method method) throws ClassNotFoundException {
+        Type returnType = method.getGenericReturnType();
+        if (returnType instanceof ParameterizedType) {
+            Type[] actualTypeArguments = ((ParameterizedType) returnType).getActualTypeArguments();
+            return ClassUtils.getClass(actualTypeArguments[0].getTypeName());
+        }
+        //not a generic
+        return ClassUtils.getClass(returnType.getTypeName());
     }
 
 
@@ -98,7 +123,7 @@ public class RestCaller {
         }
         //try defaults
         restTemplate = applicationContext.getBean(RestTemplate.class);
-        if (restTemplate!=null) {
+        if (restTemplate != null) {
             return restTemplate;
         }
         // try defaults
@@ -110,25 +135,33 @@ public class RestCaller {
     }
 
 
-    public RestResponse<JSONObject> restCall(RequestContext context) {
-        RestResponse<JSONObject> restResponse = new RestResponse<>();
-        int reqeustId = context.hashCode();
+    public RestResponse<?> restCall(RequestContext context) {
+        RestResponse restResponse = new RestResponse<>();
+        int requestId = context.hashCode();
         try {
-            log.info("\n[REST-CALL-START-{}]\nMETHOD:{}, URL: {} \nPARAMS: {}",
-                    reqeustId, context.getHttpMethod(), context.getCompletedUrl(),
+            log.info("\n[REST-CALL-START-{}]\nHINT: {}\nMETHOD:{}, URL: {} \nPARAMS: {}",
+                    requestId, context.getHint(), context.getHttpMethod(), context.getCompletedUrl(),
                     JSONObject.toJSONString(context.getParams()));
             JSONObject jsonObject = doRestCall(context);
-            restResponse.setResponse(jsonObject);
+            restResponse.setResponse(transReturnType(context, jsonObject));
         } catch (Exception e) {
             restResponse.setIfCallException(true);
             restResponse.setException(new RestCallException(e));
+        } finally {
+            log.info(
+                    "\n[REST-CALL-END-{}]\nHINT: {}\nMETHOD:{}, URL: {}  \nIF-CALL-EXCEPTION: {} \nEXCEPTION:{} \nRESP: {}",
+                    requestId, context.getHint(), context.getHttpMethod(), context.getCompletedUrl(),
+                    restResponse.getIfCallException(), restResponse.getException(),
+                    restResponse.getResponse());
         }
-        log.info(
-                "\n[REST-CALL-END-{}]\nMETHOD:{}, URL: {}  \nIF-CALL-EXCEPTION: {} \nEXCEPTION:{} \nRESP: {}",
-                reqeustId, context.getHttpMethod(), context.getCompletedUrl(),
-                restResponse.getIfCallException(), restResponse.getException(),
-                restResponse.getResponse());
         return restResponse;
+    }
+
+    /**
+     * trans return type
+     */
+    private Object transReturnType(RequestContext context, JSONObject source) {
+        return source.toJavaObject(context.getReturnType());
     }
 
     private String resolvePlaceHolder(String completeUrl) {
