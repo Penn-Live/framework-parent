@@ -44,7 +44,8 @@ public class RestConfiguration extends WebMvcConfigurationSupport {
 
     @Bean("relayHandler")
     @ConditionalOnMissingBean
-    public RelayHandler relayHandler(RelayCaller relayCaller, List<IRestRepeater> restRepeaters) {
+    public RelayHandler relayHandler(@Autowired(required = false) RelayCaller relayCaller,
+                                     @Autowired(required = false) List<IRestRepeater> restRepeaters) {
         return new RelayHandler(relayCaller, restRepeaters);
     }
 
