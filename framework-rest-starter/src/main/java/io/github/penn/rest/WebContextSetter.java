@@ -88,7 +88,8 @@ public class WebContextSetter extends OncePerRequestFilter implements HandlerInt
             if (!requestCondition.isIfInit()) {
                 WebApplicationContext webApplicationContext =
                         WebApplicationContextUtils.getWebApplicationContext(this.getServletContext());
-                requestCondition.init(webApplicationContext.getBean(RequestMappingHandlerMapping.class));
+                requestCondition.init(
+                        webApplicationContext.getBean("requestMappingHandlerMapping", RequestMappingHandlerMapping.class));
             }
 
         }
