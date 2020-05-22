@@ -8,13 +8,14 @@ import javax.annotation.PostConstruct;
 
 @Component
 public class UserServicePath extends RestDomainPathSupport {
-    public String getDomainKey() {
-        return "user-info-service";
-    }
 
 
     @Getter
     private String queryAllUser;
+
+    public UserServicePath() {
+        super("user-info-service");
+    }
 
     @PostConstruct
     protected void initUserUrls(){

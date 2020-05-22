@@ -19,17 +19,15 @@ public abstract class RestDomainPathSupport {
 
     private String domainBaseUrl;
 
-    /**
-     * get domain key
-     * @return
-     */
-    public abstract String getDomainKey();
+    public RestDomainPathSupport(String domainBaseUrl) {
+        this.domainBaseUrl = domainBaseUrl;
+    }
 
     @PostConstruct
     public void init(){
-        domainBaseUrl=restServiceDomainProperties.findDomain(getDomainKey());
+        domainBaseUrl=restServiceDomainProperties.findDomain(domainBaseUrl);
         if (StringUtils.isEmpty(domainBaseUrl)) {
-            throw new IllegalStateException("no domain key=" + getDomainKey() + " was find.");
+            throw new IllegalStateException("no domain key=" + domainBaseUrl + " was find.");
         }
     }
 
