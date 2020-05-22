@@ -15,7 +15,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
  */
 @Configuration
 @ComponentScan("io.github.penn.rest")
-@EnableConfigurationProperties
+@EnableConfigurationProperties(RestServiceDomainProperties.class)
 public class RestConfiguration extends WebMvcConfigurationSupport {
 
 

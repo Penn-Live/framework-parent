@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.example.demo.component.UserServicePath;
 import com.example.demo.entity.JointClass;
 import com.example.demo.model.DemoResponse;
 import com.example.demo.rest.service.DemoRestService;
@@ -25,6 +26,9 @@ public class DemoController implements InitializingBean {
     private RestServiceCaller restServiceCaller;
 
     private MicRestService douBanService;
+
+    @Autowired
+    private UserServicePath userServicePath;
 
     @PostMapping("/demo")
     public WebJSON demo() {
@@ -54,9 +58,8 @@ public class DemoController implements InitializingBean {
     }
 
     @PostMapping("/demo4")
-    public RestResponse demo4(@RequestBody JSONObject jsonObject) {
-        RestResponse<JSONObject> restResponse = demoRestService.demoMethod2(WebJSON.fromWebContext().peekBodyParam("name"));
-        return restResponse;
+    public String demo4(@RequestBody JSONObject jsonObject) {
+        return userServicePath.getQueryAllUser();
     }
 
 
