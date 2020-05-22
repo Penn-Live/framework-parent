@@ -4,10 +4,13 @@ import io.github.penn.rest.context.CurrentRequestContext;
 import io.github.penn.rest.context.WebContext;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -32,6 +35,8 @@ public class WebContextSetter extends OncePerRequestFilter implements HandlerInt
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
+        //init if need
+        initRequestConditionIfNeed();
         if (!requestCondition.ifInjectWebContextAnnotated(httpServletRequest)) {
             return true;
         }
@@ -68,6 +73,8 @@ public class WebContextSetter extends OncePerRequestFilter implements HandlerInt
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         HttpServletRequest chainRequest = request;
+        //init if need
+        initRequestConditionIfNeed();
         if (requestCondition.ifWrapRepeatRequest(request)) {
             //trans request
             chainRequest = new RepeatedReadAbleRequest(chainRequest);
@@ -76,5 +83,15 @@ public class WebContextSetter extends OncePerRequestFilter implements HandlerInt
 
     }
 
+    private  void initRequestConditionIfNeed() {
+        synchronized (RequestCondition.class){
+            if (!requestCondition.isIfInit()) {
+                WebApplicationContext webApplicationContext =
+                        WebApplicationContextUtils.getWebApplicationContext(this.getServletContext());
+                requestCondition.init(webApplicationContext.getBean(RequestMappingHandlerMapping.class));
+            }
+
+        }
+    }
 
 }

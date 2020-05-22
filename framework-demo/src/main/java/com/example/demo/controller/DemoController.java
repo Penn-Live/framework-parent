@@ -27,15 +27,15 @@ public class DemoController implements InitializingBean {
     private MicRestService douBanService;
 
     @PostMapping("/demo")
-    public DemoResponse demo() {
+    public WebJSON demo() {
         //WebContext.bodyParamMustHas("name", "abc");
         HttpServletRequest request = WebContext.getRequest();
 
         WebJSON webJSON = WebJSON.fromWebContext()
                 .peekBodyParam("name")
                 .peekBodyParam("age");
-        RestResponse<DemoResponse> restResponse = demoRestService.demoMethod(webJSON);
-        return restResponse.getResponse();
+
+        return webJSON;
     }
 
 

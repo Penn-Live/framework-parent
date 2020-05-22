@@ -3,7 +3,10 @@ package io.github.penn.rest;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -25,8 +28,6 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 public class RequestCondition {
 
-    @Autowired
-    private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     /**
      * cache
@@ -39,34 +40,9 @@ public class RequestCondition {
      */
     private LinkedHashSet<String> injectWebContextSet = Sets.newLinkedHashSet();
 
-
-    @PostConstruct
-    public void initRequestCondition() {
-
-        try {
-            Map<RequestMappingInfo, HandlerMethod> handlerMethods
-                    = requestMappingHandlerMapping.getHandlerMethods();
-            Set<Map.Entry<RequestMappingInfo, HandlerMethod>> entries
-                    = handlerMethods.entrySet();
-            for (Map.Entry<RequestMappingInfo, HandlerMethod> entry : entries) {
-                RequestMappingInfo requestMappingInfo = entry.getKey();
-                HandlerMethod handlerMethod = entry.getValue();
-                if (ifInjectWebContextAnnotatedFromHandlerMethod(handlerMethod)) {
-                    Set<String> patterns =
-                            requestMappingInfo.getPatternsCondition().getPatterns();
-                    if (!CollectionUtils.isEmpty(patterns)) {
-                        injectWebContextSet.addAll(patterns);
-                    }
-                }
-                log.info("find inject web method: {}", injectWebContextSet);
-            }
-
-        } catch (Exception e) {
-            log.error("init request condition error ", e);
-        }
-
-    }
-
+    @Getter
+    @Setter
+    private volatile boolean ifInit = false;
 
     /**
      * if wrap
@@ -75,6 +51,9 @@ public class RequestCondition {
      * @return
      */
     public boolean ifWrapRepeatRequest(HttpServletRequest httpServletRequest) {
+        if (!ifInit) {
+            throw new IllegalStateException("requestCondition has not init.");
+        }
         //for temp
         return ifInjectWebContextAnnotated(httpServletRequest);
     }
@@ -86,6 +65,9 @@ public class RequestCondition {
      * @return
      */
     public boolean ifInjectWebContextAnnotated(HttpServletRequest httpServletRequest) {
+        if (!ifInit) {
+            throw new IllegalStateException("requestCondition has not init.");
+        }
         String servletPath = httpServletRequest.getServletPath();
         return injectWebContextSet.contains(servletPath);
     }
@@ -95,6 +77,8 @@ public class RequestCondition {
      * if the web context need webContext
      */
     private boolean ifInjectWebContextAnnotatedFromHandlerMethod(HandlerMethod handlerMethod) {
+
+
         String cacheKey = handlerMethod.getBeanType().getName() + "." + handlerMethod.getMethod().getName();
 
         try {
@@ -120,4 +104,32 @@ public class RequestCondition {
         return false;
     }
 
+
+    /**
+     * init
+     */
+    public void init(RequestMappingHandlerMapping requestMappingHandlerMapping) {
+        try {
+            Map<RequestMappingInfo, HandlerMethod> handlerMethods
+                    = requestMappingHandlerMapping.getHandlerMethods();
+            Set<Map.Entry<RequestMappingInfo, HandlerMethod>> entries
+                    = handlerMethods.entrySet();
+            for (Map.Entry<RequestMappingInfo, HandlerMethod> entry : entries) {
+                RequestMappingInfo requestMappingInfo = entry.getKey();
+                HandlerMethod handlerMethod = entry.getValue();
+                if (ifInjectWebContextAnnotatedFromHandlerMethod(handlerMethod)) {
+                    Set<String> patterns =
+                            requestMappingInfo.getPatternsCondition().getPatterns();
+                    if (!CollectionUtils.isEmpty(patterns)) {
+                        injectWebContextSet.addAll(patterns);
+                    }
+                }
+                log.info("find inject web method: {}", injectWebContextSet);
+            }
+            ifInit = true;
+        } catch (Exception e) {
+            log.error("init request condition error ", e);
+        }
+
+    }
 }
