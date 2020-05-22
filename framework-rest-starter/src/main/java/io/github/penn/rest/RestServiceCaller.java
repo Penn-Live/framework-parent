@@ -1,30 +1,18 @@
 package io.github.penn.rest;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import io.github.penn.rest.call.GetCall;
-import io.github.penn.rest.call.PostCall;
-import io.github.penn.rest.call.RestService;
 import io.github.penn.rest.exception.RestCallException;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-
+import io.github.penn.rest.mapper.JointUtil;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
-import org.apache.commons.lang3.ClassUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Map;
 
 /**
  * rest caller
@@ -38,104 +26,86 @@ public class RestServiceCaller {
     @Autowired
     private ApplicationContext applicationContext;
 
-    private Cache<RestService, RestTemplate> restTemplateCache =
-            CacheBuilder.newBuilder().build();
+    @Autowired
+    private RestTemplate restTemplate;
 
-    //todo:下个版本做校验，现在只约定
-    public RequestContext parseRequestContext(Method method, Object[] args) throws ClassNotFoundException {
+
+    public RestServiceCaller usingRestTemplate(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+        return this;
+    }
+
+    /**
+     * postCall
+     */
+    public <P> RestResponse<JSONObject> postCall(String url, P params) {
+        RequestContext requestContext = parseRequestContext(HttpMethod.POST, url, parseJSONParams(params));
+        return (RestResponse<JSONObject>) restCall(requestContext);
+    }
+
+
+    /**
+     * get call
+     */
+    public <P> RestResponse<JSONObject> getGall(String url, P params) {
+        RequestContext requestContext = parseRequestContext(HttpMethod.GET, url, parseJSONParams(params));
+        return (RestResponse<JSONObject>) restCall(requestContext);
+    }
+
+    /**
+     * post and joint
+     */
+    public <T, P> RestResponse<JSONObject> postJoint(String url, P params, T t, String domain) {
+        RestResponse<JSONObject> restResponse = postCall(url, params);
+        if (!restResponse.getIfCallException()) {
+            JSONObject response = restResponse.getResponse();
+            JointUtil.joint(t, response, domain);
+        }
+        return restResponse;
+    }
+
+    /**
+     * get and joint
+     */
+    public <T, P> RestResponse<JSONObject> getJoint(String url, P params, T t, String domain) {
+        RestResponse<JSONObject> restResponse = getGall(url, params);
+        if (!restResponse.getIfCallException()) {
+            JSONObject response = restResponse.getResponse();
+            JointUtil.joint(t, response, domain);
+        }
+        return restResponse;
+    }
+
+
+    private RequestContext parseRequestContext(HttpMethod method, String completeUrl, JSONObject params) {
         RequestContext requestContext = new RequestContext();
-
-        RestService restServiceAnno =
-                method.getDeclaringClass().getAnnotation(RestService.class);
-        //parse rest template
-        RestTemplate restTemplate = null;
-        try {
-            restTemplate = restTemplateCache.get(restServiceAnno,
-                    () -> parseRestTemplate(restServiceAnno));
-            requestContext.setRestTemplate(restTemplate);
-        } catch (ExecutionException e) {
-            throw new RestCallException(e);
-        }
-
-        Annotation restCallAnno = method.getDeclaredAnnotations()[0];
-        String path = "";
-
         //parse return class
-        Class<?> returnClass = parseReturnClass(method);
-        requestContext.setReturnType(returnClass);
+        requestContext.setReturnType(JSONObject.class);
+        requestContext.setHttpMethod(method);
+        requestContext.setRestTemplate(this.restTemplate);
 
-        //http method
-        if (GetCall.class.equals(restCallAnno.annotationType())) {
-            GetCall getCall = (GetCall) restCallAnno;
-            path = getCall.path();
-            requestContext.setHttpMethod(HttpMethod.GET);
-            requestContext.setHint(getCall.hint());
-        }
-
-        if (PostCall.class.equals(restCallAnno.annotationType())) {
-            PostCall postCall = (PostCall) restCallAnno;
-            path = postCall.path();
-            requestContext.setHttpMethod(HttpMethod.POST);
-            requestContext.setHint(postCall.hint());
-        }
-
-        String completeUrl = StringUtils.removeEnd(restServiceAnno.domain().trim(), "/") + "/"
-                + StringUtils.removeStart(path.trim(), "/");
         //resolvePlaceholders
         completeUrl = resolvePlaceHolder(completeUrl);
         requestContext.setCompletedUrl(completeUrl);
-        if (args.length > 0) {
-            requestContext.setParams((JSONObject) args[0]);
-        } else {
-            requestContext.setParams(new JSONObject());
-        }
+        requestContext.setParams(params == null ? new JSONObject() : params);
         return requestContext;
     }
 
-    /**
-     * parse return class
-     */
-    private Class parseReturnClass(Method method) throws ClassNotFoundException {
-        Type returnType = method.getGenericReturnType();
-        if (returnType instanceof ParameterizedType) {
-            Type[] actualTypeArguments = ((ParameterizedType) returnType).getActualTypeArguments();
-            return ClassUtils.getClass(actualTypeArguments[0].getTypeName());
+
+    private <P> JSONObject parseJSONParams(P params) {
+        if (params == null) {
+            return null;
         }
-        //not a generic
-        return ClassUtils.getClass(returnType.getTypeName());
+        JSONObject p;
+        if (!(params instanceof JSONObject)) {
+            p = JSONObject.parseObject(JSONObject.toJSONString(params));
+        } else {
+            p = (JSONObject) params;
+        }
+        return p;
     }
 
-
-    /**
-     * parse rest template
-     *
-     * @param restServiceAnno
-     */
-    private RestTemplate parseRestTemplate(RestService restServiceAnno) {
-        String restBeanName = resolvePlaceHolder(restServiceAnno.restTemplate());
-        RestTemplate restTemplate;
-        if (StringUtils.isNotEmpty(restBeanName)) {
-            //resolve the name if has placeholder
-            restTemplate = applicationContext.getBean(restBeanName, RestTemplate.class);
-            if (restTemplate != null) {
-                return restTemplate;
-            }
-        }
-        //try defaults
-        restTemplate = applicationContext.getBean(RestTemplate.class);
-        if (restTemplate != null) {
-            return restTemplate;
-        }
-        // try defaults
-        String[] restTemplateBeans = applicationContext.getBeanNamesForType(RestTemplate.class);
-        if (restTemplateBeans != null && restTemplateBeans.length > 0) {
-            return applicationContext.getBean(restTemplateBeans[0], RestTemplate.class);
-        }
-        throw new RestCallException("not restTemplate to using to call.");
-    }
-
-
-    public RestResponse<?> restCall(RequestContext context) {
+    private RestResponse<?> restCall(RequestContext context) {
         RestResponse restResponse = new RestResponse<>();
         int requestId = context.hashCode();
         try {

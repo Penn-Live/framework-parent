@@ -1,26 +1,30 @@
 package com.example.demo.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.example.demo.entity.JointClass;
 import com.example.demo.model.DemoResponse;
 import com.example.demo.rest.service.DemoRestService;
-import io.github.penn.rest.InjectWebContext;
-import io.github.penn.rest.RestResponse;
+import io.github.penn.rest.*;
 import io.github.penn.rest.context.WebContext;
-import io.github.penn.rest.WebJSON;
-import javax.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/penn")
 @InjectWebContext
-public class DemoController {
+public class DemoController implements InitializingBean {
 
-    @Autowired
     private DemoRestService demoRestService;
+    @Autowired
+    private RestServiceCaller restServiceCaller;
+
+    private MicRestService douBanService;
 
     @PostMapping("/demo")
     public DemoResponse demo() {
@@ -42,8 +46,11 @@ public class DemoController {
     }
 
     @PostMapping("/demo3")
-    public RestResponse demo3(@RequestBody JSONObject jsonObject){
-        return new RestResponse();
+    public JointClass demo3(@RequestBody JSONObject jsonObject){
+        JointClass jointClass = new JointClass();
+        RestResponse<JSONObject> call =
+                douBanService.getJoint(WebJSON.newJSON().addParam("q","spring"),jointClass);
+        return jointClass;
     }
 
     @PostMapping("/demo4")
@@ -52,4 +59,8 @@ public class DemoController {
         return restResponse;
     }
 
+
+    public void afterPropertiesSet() throws Exception {
+        douBanService= new MicRestService("https://api.binstd.com/caipiao/query", restServiceCaller,"penn");
+    }
 }
