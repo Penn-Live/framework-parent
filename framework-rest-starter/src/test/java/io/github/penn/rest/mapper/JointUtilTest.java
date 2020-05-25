@@ -11,7 +11,7 @@ public class JointUtilTest {
         JointClass jointClass = new JointClass();
 
         JSONObject jsonObject=getJsonObj();
-        jointClass.joint(jsonObject, "penn");
+        jointClass.joint(jsonObject, "");
 
         System.out.println(jointClass);
 
@@ -23,7 +23,7 @@ public class JointUtilTest {
         JSONObject jsonObject=new JSONObject();
         JSONObject data = new JSONObject();
 
-        data.put("a", "a-value");
+        data.put("a", "4");
         data.put("b", 2);
         data.put("c", 3);
         JSONObject inner=new JSONObject();

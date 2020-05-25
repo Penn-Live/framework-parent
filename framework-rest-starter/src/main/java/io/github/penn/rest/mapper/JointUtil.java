@@ -5,9 +5,12 @@ import com.alibaba.fastjson.JSONPath;
 import io.github.penn.rest.exception.JointException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author tangzhongping
@@ -68,7 +71,8 @@ public class JointUtil {
             if (!StringUtils.startsWith(exp, "$.")) {
                 exp = "$." + StringUtils.removeStart(exp, ".");
             }
-            String sourcePath = "$." + declaredField.getName();
+            String fieldName = declaredField.getName();
+            String sourcePath = "$." + fieldName;
 
             if (JSONPath.contains(source, exp)) {
                 Object fieldValue = JSONPath.eval(source, exp);
@@ -78,7 +82,15 @@ public class JointUtil {
                     fieldValue = joint(fieldTarget, fieldValue, EMPTY_DOMAIN);
                     //fieldValue = JSONObject.toJavaObject((JSONObject) fieldValue, declaredField.getType());
                 }
-                JSONPath.set(target, sourcePath, fieldValue);
+                try {
+                    JSONPath.set(target, sourcePath, fieldValue);
+                } catch (Exception e) {
+                    try {
+                        BeanUtils.setProperty(target, fieldName, fieldValue);
+                    } catch (Exception exception) {
+                        throw new JointException("cant set value for property=" + fieldName);
+                    }
+                }
             }
         }
         return target;

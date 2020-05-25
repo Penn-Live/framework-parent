@@ -9,7 +9,7 @@ import java.util.List;
 public class JointClass extends JointBase {
 
     @Joint(using = "$.data.a")
-    private String a;
+    private int a;
     @Joint(using = "$.data.b")
     private Integer b;
     @Joint(using = "$.data.c")
