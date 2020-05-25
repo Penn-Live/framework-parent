@@ -6,7 +6,6 @@ import io.github.penn.rest.exception.JointException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.annotation.AnnotationUtils;
 
 import java.lang.reflect.Field;
 
@@ -22,7 +21,7 @@ public class JointUtil {
         if (t == null) {
             return false;
         }
-        return AnnotationUtils.isCandidateClass(t.getClass(), Joint.class);
+        return t.getClass().isAnnotationPresent(Joint.class);
     }
 
 
@@ -32,8 +31,7 @@ public class JointUtil {
         }
 
         if (isJointClass(t)) {
-            Joint annotation = AnnotationUtils.getAnnotation(t.getClass(), Joint.class);
-            return annotation;
+            return t.getClass().getAnnotation(Joint.class);
         }
         return null;
     }

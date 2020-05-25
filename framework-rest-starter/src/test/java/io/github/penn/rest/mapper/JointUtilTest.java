@@ -15,6 +15,8 @@ public class JointUtilTest {
 
         System.out.println(jointClass);
 
+        System.out.println(JointUtil.isJointClass(jointClass));
+
     }
 
     private static JSONObject getJsonObj() {
