@@ -76,7 +76,8 @@ public class JointUtil {
 
             if (JSONPath.contains(source, exp)) {
                 Object fieldValue = JSONPath.eval(source, exp);
-                if (fieldValue instanceof JSONObject) {
+                if ((String.class!=fieldValue.getClass())
+                        &&(!ClassUtils.isPrimitiveOrWrapper(fieldValue.getClass()))) {
                     //empty but not null field value
                     Object fieldTarget = JSONObject.toJavaObject(EMPTY, declaredField.getType());
                     fieldValue = joint(fieldTarget, fieldValue, EMPTY_DOMAIN);
