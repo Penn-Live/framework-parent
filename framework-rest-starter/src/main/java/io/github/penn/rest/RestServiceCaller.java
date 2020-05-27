@@ -5,8 +5,8 @@ import io.github.penn.rest.exception.RestCallException;
 import io.github.penn.rest.mapper.JointUtil;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -29,9 +29,11 @@ public class RestServiceCaller {
     @Autowired
     private RestTemplate restTemplate;
 
+    private ThreadLocal<RestTemplate> contextLocal = new ThreadLocal<>();
+
 
     public RestServiceCaller usingRestTemplate(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+        contextLocal.set(restTemplate);
         return this;
     }
 
@@ -82,7 +84,10 @@ public class RestServiceCaller {
         //parse return class
         requestContext.setReturnType(JSONObject.class);
         requestContext.setHttpMethod(method);
-        requestContext.setRestTemplate(this.restTemplate);
+
+        //parse restTemplate
+        RestTemplate restTemplate = ObjectUtils.defaultIfNull(contextLocal.get(), this.restTemplate);
+        requestContext.setRestTemplate(restTemplate);
 
         //resolvePlaceholders
         completeUrl = resolvePlaceHolder(completeUrl);
@@ -118,6 +123,8 @@ public class RestServiceCaller {
             restResponse.setIfCallException(true);
             restResponse.setException(new RestCallException(e));
         } finally {
+            //remove context restTemplate
+            contextLocal.remove();
             log.info(
                     "\n[REST-CALL-END-{}]\nHINT: {}\nMETHOD:{}, URL: {}  \nIF-CALL-EXCEPTION: {} \nEXCEPTION:{} \nRESP: {}",
                     requestId, context.getHint(), context.getHttpMethod(), context.getCompletedUrl(),

@@ -34,7 +34,7 @@ public class DemoController implements InitializingBean {
     public WebJSON demo() {
         //WebContext.bodyParamMustHas("name", "abc");
         HttpServletRequest request = WebContext.getRequest();
-
+        restServiceCaller.postCall("", null);
         WebJSON webJSON = WebJSON.fromWebContext()
                 .peekBodyParam("name")
                 .peekBodyParam("age");
