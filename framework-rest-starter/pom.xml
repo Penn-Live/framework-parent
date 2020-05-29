@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>framework-rest-starter</artifactId>
-    <version>1.2.8-RELEASE</version>
+    <version>1.2.9-RELEASE</version>
     <packaging>jar</packaging>
     <modelVersion>4.0.0</modelVersion>
 

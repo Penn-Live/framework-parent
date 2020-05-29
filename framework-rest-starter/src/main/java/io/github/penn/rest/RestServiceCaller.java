@@ -8,6 +8,7 @@ import okhttp3.HttpUrl;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -21,15 +22,24 @@ import java.util.Map;
  */
 @Slf4j
 @Component
+@Scope("prototype")
 public class RestServiceCaller {
 
     @Autowired
     private ApplicationContext applicationContext;
 
     @Autowired
-    private RestTemplate restTemplate;
+    private RestTemplate defaultRestTemplate;
+
+    private RestTemplate bindingRestTemplate;
 
     private ThreadLocal<RestTemplate> contextLocal = new ThreadLocal<>();
+
+
+    public RestServiceCaller bindingRestTemplate(RestTemplate restTemplate){
+        this.bindingRestTemplate=restTemplate;
+        return this;
+    }
 
 
     public RestServiceCaller usingRestTemplate(RestTemplate restTemplate) {
@@ -86,7 +96,8 @@ public class RestServiceCaller {
         requestContext.setHttpMethod(method);
 
         //parse restTemplate
-        RestTemplate restTemplate = ObjectUtils.defaultIfNull(contextLocal.get(), this.restTemplate);
+        RestTemplate restTemplate
+                =ObjectUtils.firstNonNull(contextLocal.get(), this.bindingRestTemplate,this.defaultRestTemplate);
         requestContext.setRestTemplate(restTemplate);
 
         //resolvePlaceholders
