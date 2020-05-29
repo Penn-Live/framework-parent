@@ -1,16 +1,21 @@
 package io.github.penn.rest.mapper;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
+import com.google.common.collect.Lists;
 import io.github.penn.rest.exception.JointException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * @author tangzhongping
@@ -76,13 +81,29 @@ public class JointUtil {
 
             if (JSONPath.contains(source, exp)) {
                 Object fieldValue = JSONPath.eval(source, exp);
-                if ((String.class!=fieldValue.getClass())
-                        &&(!ClassUtils.isPrimitiveOrWrapper(fieldValue.getClass()))) {
+                if (declaredField.getType()== List.class
+                    &&fieldValue.getClass()== JSONArray.class) {
+                    JSONArray dataArray = (JSONArray) fieldValue;
+                    List list = Lists.newArrayList();
+                    Class classInObject = resolveGenericClass(declaredField);
+                    for (Object value : dataArray) {
+                        //new object
+                        Object objInList = JSONObject.toJavaObject(EMPTY, classInObject);
+                        //fill object
+                        objInList=joint(objInList, value, EMPTY_DOMAIN);
+                        list.add(objInList);
+                    }
+                    //set value
+                    fieldValue=list;
+                } else if ((String.class != fieldValue.getClass())
+                        && (!ClassUtils.isPrimitiveOrWrapper(fieldValue.getClass()))) {
                     //empty but not null field value
                     Object fieldTarget = JSONObject.toJavaObject(EMPTY, declaredField.getType());
                     fieldValue = joint(fieldTarget, fieldValue, EMPTY_DOMAIN);
                     //fieldValue = JSONObject.toJavaObject((JSONObject) fieldValue, declaredField.getType());
                 }
+
+                //set value
                 try {
                     JSONPath.set(target, sourcePath, fieldValue);
                 } catch (Exception e) {
@@ -95,6 +116,20 @@ public class JointUtil {
             }
         }
         return target;
+    }
+
+    private static Class resolveGenericClass(Field declaredField) {
+        Type genericType = declaredField.getGenericType();
+        if (null == genericType) {
+            return JSONObject.class;
+        }
+        if (genericType instanceof ParameterizedType) {
+            ParameterizedType pt = (ParameterizedType) genericType;
+            // 得到泛型里的class类型对象
+            Class<?> actualTypeArgument = (Class<?>)pt.getActualTypeArguments()[0];
+            return actualTypeArgument;
+        }
+        return JSONObject.class;
     }
 
 

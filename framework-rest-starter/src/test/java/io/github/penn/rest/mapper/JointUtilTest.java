@@ -1,6 +1,7 @@
 package io.github.penn.rest.mapper;
 
 import com.alibaba.fastjson.JSONObject;
+import lombok.Data;
 
 import java.util.Arrays;
 import java.util.List;
@@ -8,16 +9,15 @@ import java.util.List;
 public class JointUtilTest {
 
     public static void main(String[] args) {
-        JointClass jointClass = new JointClass();
+        JSONObject jsonObject = JSONObject.parseObject("{\"retCode\":\"2\",\"retMsg\":\"abc.\",\"data\":[{\"a\":\"1\",\"c\":\"success.\"},{\"a\":\"4\",\"c\":\"server success.\"},{\"a\":\"3\",\"c\":\"server success.\"}]}");
 
-        JSONObject jsonObject=getJsonObj();
-        jointClass.joint(jsonObject, "");
-
-        System.out.println(jointClass);
-
-        System.out.println(JointUtil.isJointClass(jointClass));
+        NewJoint newJoint = new NewJoint();
+        JointUtil.joint(newJoint, jsonObject, "");
+        System.out.println(newJoint);
 
     }
+
+
 
     private static JSONObject getJsonObj() {
         JSONObject jsonObject=new JSONObject();
@@ -38,4 +38,20 @@ public class JointUtilTest {
     }
 
 
+}
+
+@Joint
+@Data
+class NewJoint{
+    private String retCode;
+    private String retMsg;
+    private List<InnerClass> data;
+
+}
+
+@Joint
+@Data
+class InnerClass{
+    private String a;
+    private String c;
 }
