@@ -81,8 +81,8 @@ public class JointUtil {
 
             if (JSONPath.contains(source, exp)) {
                 Object fieldValue = JSONPath.eval(source, exp);
-                if (declaredField.getType()== List.class
-                    &&fieldValue.getClass()== JSONArray.class) {
+                if (List.class.isAssignableFrom(declaredField.getType())
+                    &&List.class.isAssignableFrom(fieldValue.getClass())) {
                     JSONArray dataArray = (JSONArray) fieldValue;
                     List list = Lists.newArrayList();
                     Class classInObject = resolveGenericClass(declaredField);
