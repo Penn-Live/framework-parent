@@ -1,17 +1,18 @@
 package io.github.penn.rest;
 
 import com.google.common.base.Splitter;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
-import java.util.Spliterator;
 
 /**
  * @author tangzhongping
  */
+@Slf4j
 public abstract class RestDomainPathSupport {
 
     @Autowired
@@ -19,17 +20,27 @@ public abstract class RestDomainPathSupport {
 
     private String domainBaseUrl;
 
-    public RestDomainPathSupport(String domainBaseUrl) {
-        this.domainBaseUrl = domainBaseUrl;
-    }
+    public RestDomainPathSupport() { }
 
     @PostConstruct
     public void init(){
-        domainBaseUrl=restServiceDomainProperties.findDomain(domainBaseUrl);
+        domainBaseUrl=restServiceDomainProperties.findDomain(StringUtils.defaultString(getDomainKey()));
+
+        if (restServiceDomainProperties.isEmpty()) {
+            log.warn("empty domain properties, please check.");
+            return;
+        }
         if (StringUtils.isEmpty(domainBaseUrl)) {
-            throw new IllegalStateException("no domain key=" + domainBaseUrl + " was find.");
+            throw new IllegalStateException("no domain key=" + getDomainKey() + " was find.");
         }
     }
+
+    /**
+     * 获取domain的key
+     * @return
+     */
+    public abstract String getDomainKey();
+
 
 
     /**

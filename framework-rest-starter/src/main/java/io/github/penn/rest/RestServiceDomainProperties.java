@@ -15,13 +15,13 @@ import java.util.Map;
 @Data
 public class RestServiceDomainProperties {
 
-    private Map<String,String> domain;
+    private Map<String, String> domain;
 
 
     /**
      * find domain
      */
-    public String findDomain(String key){
+    public String findDomain(String key) {
         if (StringUtils.isEmpty(key)) {
             return null;
         }
@@ -29,6 +29,11 @@ public class RestServiceDomainProperties {
             return null;
         }
         return domain.get(key);
+    }
+
+
+    public boolean isEmpty() {
+        return domain == null || domain.isEmpty();
     }
 
 }

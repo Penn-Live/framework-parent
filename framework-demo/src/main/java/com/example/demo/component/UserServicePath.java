@@ -13,8 +13,9 @@ public class UserServicePath extends RestDomainPathSupport {
     @Getter
     private String queryAllUser;
 
-    public UserServicePath() {
-        super("user-info-service");
+
+    public String getDomainKey() {
+        return "user-info-service";
     }
 
     @PostConstruct
