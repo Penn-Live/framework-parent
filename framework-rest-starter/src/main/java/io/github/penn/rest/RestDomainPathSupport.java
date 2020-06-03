@@ -47,7 +47,11 @@ public abstract class RestDomainPathSupport {
      * add segment
      */
     public String addPath(String path){
-        HttpUrl.Builder builder = HttpUrl.parse(domainBaseUrl).newBuilder();
+        if (StringUtils.isAnyEmpty(this.domainBaseUrl,path)) {
+            log.error("path or base domain url can't be null, please check");
+            return null;
+        }
+        HttpUrl.Builder builder = HttpUrl.parse(this.domainBaseUrl).newBuilder();
         List<String> paths = Splitter.on("/").omitEmptyStrings()
                 .trimResults().splitToList(path);
         paths.forEach(builder::addPathSegment);
