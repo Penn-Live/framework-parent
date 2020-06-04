@@ -59,7 +59,7 @@ public class JointUtil {
         for (Field declaredField : declaredFields) {
             Joint fieldJoint = declaredField.getAnnotation(Joint.class);
             JointEntity jointEntity = getJointEntity(classJoint, fieldJoint);
-            if (jointEntity == null) {
+            if (jointEntity == null||jointEntity.skip) {
                 continue;
             }
 
@@ -81,6 +81,7 @@ public class JointUtil {
 
             if (JSONPath.contains(source, exp)) {
                 Object fieldValue = JSONPath.eval(source, exp);
+                //1.List类型
                 if (List.class.isAssignableFrom(declaredField.getType())
                     &&List.class.isAssignableFrom(fieldValue.getClass())) {
                     List dataArray = (List) fieldValue;
@@ -95,6 +96,7 @@ public class JointUtil {
                     }
                     //set value
                     fieldValue=list;
+
                 } else if ((String.class != fieldValue.getClass())
                         && (!ClassUtils.isPrimitiveOrWrapper(fieldValue.getClass()))) {
                     //empty but not null field value
@@ -141,14 +143,14 @@ public class JointUtil {
             if (classJoint == null) {
                 return null;
             } else {
-                return new JointEntity(classJoint.domain(), classJoint.using());
+                return new JointEntity(classJoint.domain(), classJoint.using(),classJoint.skip());
             }
         } else {
             if (classJoint == null) {
-                return new JointEntity(fieldJoint.domain(), fieldJoint.using());
+                return new JointEntity(fieldJoint.domain(), fieldJoint.using(),fieldJoint.skip());
             } else {
                 return new JointEntity(StringUtils.defaultIfBlank(fieldJoint.domain(), classJoint.domain()),
-                        StringUtils.defaultIfBlank(fieldJoint.using(), classJoint.using()));
+                        StringUtils.defaultIfBlank(fieldJoint.using(), classJoint.using()),fieldJoint.skip());
             }
         }
 
@@ -160,5 +162,6 @@ public class JointUtil {
     static class JointEntity {
         String domain;
         String using;
+        boolean skip;
     }
 }

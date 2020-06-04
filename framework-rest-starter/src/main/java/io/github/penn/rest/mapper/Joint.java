@@ -14,4 +14,6 @@ public @interface Joint {
 
     String using() default "";
 
+    boolean skip() default false;
+
 }
