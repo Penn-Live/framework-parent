@@ -13,4 +13,10 @@ public class JointBase {
         JointUtil.joint(this, source, domain);
         return this;
     }
+
+    public<T> JointBase using(T source,String domain){
+        JointUtil.joint(this, source, domain);
+        return this;
+    }
+
 }

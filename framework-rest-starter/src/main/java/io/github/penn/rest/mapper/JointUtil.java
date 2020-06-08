@@ -1,6 +1,5 @@
 package io.github.penn.rest.mapper;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.google.common.collect.Lists;
@@ -8,7 +7,6 @@ import io.github.penn.rest.exception.JointException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -43,6 +41,7 @@ public class JointUtil {
         }
         return null;
     }
+
 
 
     /**

@@ -16,4 +16,6 @@ public @interface Joint {
 
     boolean skip() default false;
 
+    String refine() default "";
+
 }
