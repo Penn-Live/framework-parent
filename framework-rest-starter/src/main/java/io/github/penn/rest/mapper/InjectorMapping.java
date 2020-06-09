@@ -1,30 +1,58 @@
 package io.github.penn.rest.mapper;
 
-import lombok.Getter;
+import com.google.common.collect.Maps;
+import java.util.Map;
+import org.apache.logging.log4j.util.Strings;
 
 /**
  * Injector Mapping
  */
 public class InjectorMapping {
 
-    @Getter
-    private String sourcePath;
-    @Getter
-    private String targetPath;
+  private static final String ROOT = "ROOT";
+  /**
+   * path maps
+   */
+  public static class PathMapping {
 
-    private InjectorMapping(){}
 
-    private InjectorMapping(String sourcePath,String targetPath){
-        this.sourcePath=sourcePath;
-        this.targetPath=targetPath;
+    //source 2 target
+    Map<String, String> pathMappings = Maps.newHashMap();
+
+    private PathMapping() {
     }
 
-    public static InjectorMapping DEFAULT_MAPPING =new InjectorMapping("","");
+    public PathMapping addMapping(String sourcePath, String targetPath) {
+      pathMappings.put(sourcePath, targetPath);
+      return this;
+    }
 
+    public PathMapping targetRootMapping(String targetPath) {
+      return addMapping(ROOT, targetPath);
+    }
 
-    public static InjectorMapping mapping(String sourcePath,String targetPath){
-        return new InjectorMapping(sourcePath,targetPath);
+    public PathMapping addDefaultMapping() {
+      return addMapping(ROOT, ROOT);
     }
 
 
+
+
+    public Map<String, String> readingMappings() {
+      return pathMappings;
+    }
+
+
+  }
+
+
+  public static final PathMapping DEFAULT_MAPPING = new PathMapping().addDefaultMapping();
+
+  public static PathMapping newPathMappings() {
+    return new PathMapping();
+  }
+
+  public static  boolean isRootPath(String path) {
+    return ROOT.equalsIgnoreCase(path);
+  }
 }
