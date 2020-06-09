@@ -2,26 +2,23 @@ package io.github.penn.rest.mapper;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
-import com.google.common.base.Splitter;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
 import io.github.penn.rest.mapper.InjectorMapping.PathMapping;
-import java.util.Map.Entry;
-import java.util.concurrent.ExecutionException;
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.ClassUtils;
-import org.reflections.ReflectionUtils;
-
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.reflections.ReflectionUtils;
 
 /**
  * Object properties injector
@@ -75,8 +72,11 @@ public class PropertiesInjector<T> {
       if (InjectorMapping.isRootPath(targetPath)) {
         doInjectObject(source, target);
         return;
+      } else {
+        //not root
+        findAndSetProperties(source, target, targetPath);
       }
-      //
+
     }
   }
 
@@ -85,8 +85,10 @@ public class PropertiesInjector<T> {
     //parse more paths
     int firstPathIndex = targetPath.indexOf(".");
     String currentPath = targetPath;
+    String restPath = null;
     if (firstPathIndex != -1) {
-      currentPath = currentPath.substring(0, firstPathIndex);
+      currentPath = targetPath.substring(0, firstPathIndex);
+      restPath = targetPath.substring(firstPathIndex + 1);
     }
     try {
       Map<String, Field> fieldMap = injectCaching.get(target.getClass());
@@ -96,17 +98,24 @@ public class PropertiesInjector<T> {
       }
       Field field = fieldMap.get(currentPath);
       Object targetPropertyValue = field.get(target);
-      if (isObjectType(field.getType()) && targetPropertyValue == null) {
-        //instance
-        targetPropertyValue = JSONObject.toJavaObject(EMPTY, field.getType());
+      if (isObjectType(field.getType())) {
+        if (targetPropertyValue == null) {
+          //instance
+          targetPropertyValue = JSONObject.toJavaObject(EMPTY, field.getType());
+        }
+        if (StringUtils.isNotEmpty(restPath)) {
+          findAndSetProperties(source, targetPropertyValue, restPath);
+        } else {
+          doInjectObject(source, targetPropertyValue);
+        }
+        field.set(target, targetPropertyValue);
+      } else if (isListType(field.getType())) {
+        //todo:listType
 
-
-
-
-
+      } else if (isCommonType(field.getType())) {
+        //common type, can't split anymore
+        doInjectCommon(source, target, field);
       }
-
-
     } catch (Exception e) {
       //todo:
     }
@@ -150,6 +159,8 @@ public class PropertiesInjector<T> {
       } catch (Exception e) {
         //todo:log
       }
+    } else if (isListType(targetObj.getClass()) && isListType(sourceObj.getClass())) {
+      //todo:is list
     }
     return this;
   }
@@ -162,7 +173,7 @@ public class PropertiesInjector<T> {
     try {
       //1.common type 2 common type
       if (isCommonType(field.getType()) && isCommonType(sourceObj.getClass())) {
-        field.set(targetObj, ConvertUtils.convert(targetObj, field.getType()));
+        field.set(targetObj, ConvertUtils.convert(sourceObj, field.getType()));
         return this;
       }
     } catch (Exception e) {

@@ -17,9 +17,22 @@ public class JSONPathTest {
         JSONObject person = getPerson();
 
         Person person1=new Person();
-        PropertiesInjector
-                .to(person1)
-                .inject(person, InjectorMapping.DEFAULT_MAPPING);
+//        PropertiesInjector
+//                .to(person1)
+//                .inject(person, InjectorMapping.DEFAULT_MAPPING);
+
+        JSONObject kid1 = new JSONObject();
+        kid1.put("id", "99999");
+        kid1.put("name", "pp");
+        JSONObject resp = new JSONObject();
+        resp.put("ppp", kid1);
+
+        PropertiesInjector.to(person1)
+            .inject(resp,
+                InjectorMapping.newPathMappings()
+                .addMapping("ppp","kid")
+            );
+
         System.out.println(person1);
     }
 
