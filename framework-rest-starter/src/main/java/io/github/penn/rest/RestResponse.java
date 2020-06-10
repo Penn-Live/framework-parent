@@ -34,6 +34,9 @@ public class RestResponse<T> implements Serializable {
 
     T response;
 
+    private String bisRetCode;
+    private String bisRetMsg;
+
     private RestCallException exception;
 
     @Override

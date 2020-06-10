@@ -1,9 +1,11 @@
 package io.github.penn.rest;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONPath;
 import io.github.penn.rest.mapper.InjectorMapping;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.function.Function;
@@ -18,6 +20,9 @@ public class MicRestService {
     private RestServiceCaller restServiceCaller;
     private String domain = Strings.EMPTY;
     private Function<RestResponse, Boolean> ifBisErrorFunction=(e)-> false;
+
+    private String retCodeParam;
+    private String retMsgParam;
 
     public MicRestService(String url, RestServiceCaller restServiceCaller) {
         this.url = url;
@@ -36,6 +41,17 @@ public class MicRestService {
         this.restServiceCaller = restServiceCaller;
         this.domain = domain;
     }
+
+    public MicRestService usingRetCode(String retCodeParam){
+        this.retCodeParam=retCodeParam;
+        return this;
+    }
+
+    public MicRestService usingRetMsg(String retMsgParam){
+        this.retMsgParam=retMsgParam;
+        return this;
+    }
+
 
     public <P> RestResponse<JSONObject> postCall(P params) {
         return ifBisError(restServiceCaller.postCall(url, params));
@@ -77,13 +93,20 @@ public class MicRestService {
         return  ifBisError(restServiceCaller.getInject(url, params, target, pathMapping));
     }
 
-    public <T, P> RestResponse<JSONObject> postInject(P params, T target, InjectorMapping.PathMapping pathMapping) {
-        return (restServiceCaller.postInject(url, params, target, pathMapping));
-    }
+
+
+
 
     public RestResponse ifBisError(RestResponse restResponse){
         if (ifBisErrorFunction!=null) {
             restResponse.setIfBisException(ifBisErrorFunction.apply(restResponse));
+        }
+        if (StringUtils.isNotEmpty(retCodeParam)) {
+            restResponse.setBisRetCode(String.valueOf(JSONPath.eval(restResponse.response,retCodeParam)));
+        }
+
+        if (StringUtils.isNotEmpty(retMsgParam)) {
+            restResponse.setBisRetMsg(String.valueOf(JSONPath.eval(restResponse.response,retMsgParam)));
         }
         return restResponse;
     }
