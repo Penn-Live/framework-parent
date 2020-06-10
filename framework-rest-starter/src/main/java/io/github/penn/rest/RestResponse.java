@@ -25,6 +25,13 @@ public class RestResponse<T> implements Serializable {
      */
     private Boolean ifCallException = false;
 
+
+    /**
+     * if bis Exception
+     */
+    private Boolean ifBisException = false;
+
+
     T response;
 
     private RestCallException exception;
@@ -58,7 +65,6 @@ public class RestResponse<T> implements Serializable {
             throw exception;
         }
     }
-
 
 
 }

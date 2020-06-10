@@ -2,7 +2,9 @@ package io.github.penn.rest;
 
 import com.alibaba.fastjson.JSONObject;
 import io.github.penn.rest.exception.RestCallException;
+import io.github.penn.rest.mapper.InjectorMapping;
 import io.github.penn.rest.mapper.JointUtil;
+import io.github.penn.rest.mapper.PropertiesInjector;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
 import org.apache.commons.lang3.ObjectUtils;
@@ -87,6 +89,64 @@ public class RestServiceCaller {
         }
         return restResponse;
     }
+
+
+    /**
+     * get and inject
+     */
+    public <T, P> RestResponse<JSONObject> getInject(String url, P params, T t, InjectorMapping.PathMapping pathMapping) {
+        RestResponse<JSONObject> restResponse = getGall(url, params);
+        if (!restResponse.getIfCallException()) {
+            JSONObject response = restResponse.getResponse();
+            PropertiesInjector.to(t)
+                    .inject(response, pathMapping);
+        }
+        return restResponse;
+    }
+
+
+    /**
+     * get and inject
+     */
+    public <T, P> RestResponse<JSONObject> getInject(String url, P params, T t) {
+        RestResponse<JSONObject> restResponse = getGall(url, params);
+        if (!restResponse.getIfCallException()) {
+            JSONObject response = restResponse.getResponse();
+            PropertiesInjector.to(t)
+                    .inject(response, InjectorMapping.DEFAULT_MAPPING);
+        }
+        return restResponse;
+    }
+
+
+    /**
+     * post and joint
+     */
+    public <T, P> RestResponse<JSONObject> postInject(String url, P params, T t, InjectorMapping.PathMapping pathMapping) {
+        RestResponse<JSONObject> restResponse = postCall(url, params);
+        if (!restResponse.getIfCallException()) {
+            JSONObject response = restResponse.getResponse();
+            PropertiesInjector.to(t)
+                    .inject(response, pathMapping);
+        }
+        return restResponse;
+    }
+
+    /**
+     * post and joint
+     */
+    public <T, P> RestResponse<JSONObject> postInject(String url, P params, T t) {
+        RestResponse<JSONObject> restResponse = postCall(url, params);
+        if (!restResponse.getIfCallException()) {
+            JSONObject response = restResponse.getResponse();
+            PropertiesInjector.to(t)
+                    .inject(response, InjectorMapping.DEFAULT_MAPPING);
+        }
+        return restResponse;
+    }
+
+
+
 
 
     private RequestContext parseRequestContext(HttpMethod method, String completeUrl, JSONObject params) {
