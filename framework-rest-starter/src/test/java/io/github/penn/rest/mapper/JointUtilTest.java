@@ -18,15 +18,14 @@ public class JointUtilTest {
     }
 
 
-
     private static JSONObject getJsonObj() {
-        JSONObject jsonObject=new JSONObject();
+        JSONObject jsonObject = new JSONObject();
         JSONObject data = new JSONObject();
 
         data.put("a", "4");
         data.put("b", 2);
         data.put("c", 3);
-        JSONObject inner=new JSONObject();
+        JSONObject inner = new JSONObject();
         inner.put("ac", "inner-aValue");
         data.put("d", inner);
 
@@ -42,7 +41,7 @@ public class JointUtilTest {
 
 @Joint
 @Data
-class NewJoint{
+class NewJoint {
     private String retCode;
     private String retMsg;
     private List<InnerClass> data;
@@ -51,7 +50,7 @@ class NewJoint{
 
 @Joint
 @Data
-class InnerClass{
+class InnerClass {
     private String a;
     private String c;
 }

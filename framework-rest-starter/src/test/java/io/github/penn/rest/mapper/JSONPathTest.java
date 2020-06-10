@@ -2,7 +2,6 @@ package io.github.penn.rest.mapper;
 
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
-import io.github.penn.rest.mapper.InjectorMapping.PathMapping;
 import lombok.Data;
 import lombok.ToString;
 
@@ -27,10 +26,16 @@ public class JSONPathTest {
         JSONObject resp = new JSONObject();
         resp.put("ppp", kid1);
 
+        JSONObject outer = new JSONObject();
+        outer.put("ooo", resp);
+
+        JSONObject outer1 = new JSONObject();
+        outer1.put("ooo1", outer);
+//
         PropertiesInjector.to(person1)
-            .inject(resp,
+            .inject(outer1,
                 InjectorMapping.newPathMappings()
-                .addMapping("ppp","kid")
+                .addMapping("ooo1.ooo.ppp","kid")
             );
 
         System.out.println(person1);
