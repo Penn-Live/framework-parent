@@ -27,6 +27,9 @@ public class InjectorMapping {
       return this;
     }
 
+    public PathMapping sourceRootMapping(String sourcePath){return addMapping(sourcePath,ROOT);}
+
+
     public PathMapping targetRootMapping(String targetPath) {
       return addMapping(ROOT, targetPath);
     }

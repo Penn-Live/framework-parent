@@ -98,9 +98,6 @@ public class MicRestService {
 
 
     public RestResponse ifBisError(RestResponse restResponse){
-        if (ifBisErrorFunction!=null) {
-            restResponse.setIfBisException(ifBisErrorFunction.apply(restResponse));
-        }
         if (StringUtils.isNotEmpty(retCodeParam)) {
             restResponse.setBisRetCode(String.valueOf(JSONPath.eval(restResponse.response,retCodeParam)));
         }
@@ -108,6 +105,11 @@ public class MicRestService {
         if (StringUtils.isNotEmpty(retMsgParam)) {
             restResponse.setBisRetMsg(String.valueOf(JSONPath.eval(restResponse.response,retMsgParam)));
         }
+
+        if (ifBisErrorFunction!=null) {
+            restResponse.setIfBisException(ifBisErrorFunction.apply(restResponse));
+        }
+
         return restResponse;
     }
 
