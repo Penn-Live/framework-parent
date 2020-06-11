@@ -94,6 +94,13 @@ public class MicRestService {
     }
 
 
+    public <T, P> RestResponse<JSONObject> postInject(P params, T target, InjectorMapping.PathMapping pathMapping) {
+        return  ifBisError(restServiceCaller.postInject(url, params, target,pathMapping));
+    }
+
+
+
+
 
 
 
