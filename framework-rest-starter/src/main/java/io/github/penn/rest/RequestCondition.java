@@ -28,6 +28,8 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 public class RequestCondition {
 
+    @Autowired
+    private RestServiceProperties restServiceProperties;
 
     /**
      * cache
@@ -55,7 +57,7 @@ public class RequestCondition {
             throw new IllegalStateException("requestCondition has not init.");
         }
         //for temp
-        return ifInjectWebContextAnnotated(httpServletRequest);
+        return ifInjectWebContextAnnotated(httpServletRequest)||restServiceProperties.isEnableAllInject();
     }
 
     /**
@@ -65,6 +67,9 @@ public class RequestCondition {
      * @return
      */
     public boolean ifInjectWebContextAnnotated(HttpServletRequest httpServletRequest) {
+        if (restServiceProperties.isEnableAllInject()) {
+            return true;
+        }
         if (!ifInit) {
             throw new IllegalStateException("requestCondition has not init.");
         }
@@ -130,6 +135,7 @@ public class RequestCondition {
         } catch (Exception e) {
             log.error("init request condition error ", e);
         }
-
     }
+
+
 }

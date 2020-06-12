@@ -13,10 +13,11 @@ import java.util.Map;
  */
 @ConfigurationProperties("rest")
 @Data
-public class RestServiceDomainProperties {
+public class RestServiceProperties {
 
     private Map<String, String> domain;
 
+    private boolean enableAllInject = false;
 
     /**
      * find domain

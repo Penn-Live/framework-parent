@@ -16,7 +16,7 @@ import java.util.List;
 public abstract class RestDomainPathSupport {
 
     @Autowired
-    private RestServiceDomainProperties restServiceDomainProperties;
+    private RestServiceProperties restServiceDomainProperties;
 
     private String domainBaseUrl;
 
